@@ -12,6 +12,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.CircleBuilder;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.RectangleBuilder;
 import javafx.stage.Stage;
 
 public class GradientBuilderApp extends Application {
@@ -20,8 +24,8 @@ public class GradientBuilderApp extends Application {
 	Scene scene;
 	BorderPane root;
 	
-	StackPane region1;
-	StackPane region2;
+	Rectangle rectangle;
+	Circle circle;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -67,25 +71,28 @@ public class GradientBuilderApp extends Application {
 	}
 	
 	private StackPane configureTopPane(){
-		region1 = StackPaneBuilder.create()
-								  .style("-fx-background-color:yellow;")
-								  .build();
 		
+		rectangle = RectangleBuilder.create().build();
+		StackPane sp = StackPaneBuilder.create()
+									   .style("-fx-background-color:yellow;")
+									   .build();
+
 		StackPane topPane = StackPaneBuilder.create()
 											.padding(new Insets(15))
-											.children(region1)
+											.children(sp)
 											.build();
 		return topPane;
 	}
 	
 	private StackPane configureBottomPane(){
-		region2 = StackPaneBuilder.create()
+		circle = CircleBuilder.create().build();
+		StackPane sp = StackPaneBuilder.create()
 								  .style("-fx-background-color:yellow;")
 								  .build();
 		
 		StackPane bottomPane = StackPaneBuilder.create()
 											.padding(new Insets(15))
-											.children(region2)
+											.children(sp)
 											.build();
 		return bottomPane;
 	}
