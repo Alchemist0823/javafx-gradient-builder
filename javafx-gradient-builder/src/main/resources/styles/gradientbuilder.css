@@ -72,3 +72,37 @@
 .scroll-pane > * > .scroll-bar:vertical .thumb {
     -fx-background-insets: 3 2 3 3;
 }
+
+.split-pane{
+	-fx-background-color:transparent;
+	-fx-background-insets:0;
+	-fx-padding: 0;
+}
+
+.custom-radio-btn, .custom-radio-btn:focused{
+	-fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-cursor:hand;
+    -fx-text-fill: #333333;
+    -fx-font-size:16;
+    -fx-font-family:verdana;
+    
+}
+.radio-selected-c1{
+	-fx-fill: linear-gradient(to bottom, #61627A, #C4C6D0);
+}
+.radio-selected-c2{
+	-fx-fill: linear-gradient(to bottom, #9A9CB4, #F3F3F3);
+}
+.radio-selected-c3{
+	-fx-fill: linear-gradient(to bottom, #37813E, #268041);
+}
+.radio-unselected-c1{
+	-fx-fill: linear-gradient(to bottom, #C4C6D0, #61627A);
+}
+.radio-unselected-c2{
+	-fx-fill: linear-gradient(to bottom, #F3F3F3, #9A9CB4);
+}
+.radio-unselected-c3{
+	-fx-fill: linear-gradient(to bottom, #4C4C66, #626288);
+}
