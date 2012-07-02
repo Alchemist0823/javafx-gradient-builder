@@ -88,21 +88,40 @@
     -fx-font-family:verdana;
     
 }
+
 .radio-selected-c1{
 	-fx-fill: linear-gradient(to bottom, #61627A, #C4C6D0);
 }
+
 .radio-selected-c2{
 	-fx-fill: linear-gradient(to bottom, #9A9CB4, #F3F3F3);
 }
+
 .radio-selected-c3{
-	-fx-fill: linear-gradient(to bottom, #37813E, #268041);
+	-fx-fill: linear-gradient(to bottom, #57AE43, #91ED77);
+	-fx-stroke-width:1px;
+	-fx-stroke:#4C4C66;
 }
+
 .radio-unselected-c1{
 	-fx-fill: linear-gradient(to bottom, #C4C6D0, #61627A);
 }
+
 .radio-unselected-c2{
 	-fx-fill: linear-gradient(to bottom, #F3F3F3, #9A9CB4);
 }
+
 .radio-unselected-c3{
 	-fx-fill: linear-gradient(to bottom, #4C4C66, #626288);
+}
+
+.colorInfo-box{
+	-fx-background-radius: 0px 0px 3px 3px;
+}
+
+.color-palatte-popup{
+	-fx-background-color: black; 
+	-fx-font-size: 16;
+	-fx-background-radius: 0px 0px 3px 3px;
+    -fx-effect: dropshadow( three-pass-box  , rgba(0,0,0,0.6) , 12, 0.4 , 0 , 0 );
 }
