@@ -184,7 +184,9 @@ public class GradientBuilderApp extends Application {
 	 * @return ScrollPane
 	 */
 	private ScrollPane configureGradientSettings(){
-		StackPane cont = StackPaneBuilder.create().minHeight(900).minWidth(700).build();
+		StackPane cont = StackPaneBuilder.create().minHeight(900)
+									.minWidth(700)
+									.children(new ColorPicker()).build();
 		
 		ScrollPane scroll = ScrollPaneBuilder.create()
 				                             .styleClass("builder-scroll-pane")
