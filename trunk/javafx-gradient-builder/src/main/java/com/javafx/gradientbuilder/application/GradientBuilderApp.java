@@ -2,18 +2,24 @@ package com.javafx.gradientbuilder.application;
 
 
 import javafx.application.Application;
+import javafx.beans.binding.DoubleBinding;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPaneBuilder;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.ToolBarBuilder;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.CircleBuilder;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.EllipseBuilder;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 import javafx.stage.Stage;
@@ -25,7 +31,12 @@ public class GradientBuilderApp extends Application {
 	BorderPane root;
 	
 	Rectangle rectangle;
-	Circle circle;
+	Ellipse circle;
+	
+	enum GradientType { LINEAR, RADIAL };
+	
+	// Properties
+	private GradientType gradientType = GradientType.LINEAR;
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -37,7 +48,38 @@ public class GradientBuilderApp extends Application {
 		configureScene();
 		configureStage();
 		
-		configure();
+		configureCenter();
+		configureToolBar();
+	}
+
+	private void configureToolBar() {
+		ToolBar tb = ToolBarBuilder.create().prefHeight(35).build();
+		
+		final CustomRadioButton linearButton = new CustomRadioButton("Linear");
+		linearButton.setSelected(true);
+		
+		final CustomRadioButton radialButton = new CustomRadioButton("Radial");
+		
+		EventHandler<ActionEvent> btnAction = new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				if(linearButton.getSelected()){
+					linearButton.setSelected(false);
+					radialButton.setSelected(true);
+					gradientType = GradientType.RADIAL;
+				}else{
+					linearButton.setSelected(true);
+					radialButton.setSelected(false);
+					gradientType = GradientType.LINEAR;
+				}
+			}
+		};
+		linearButton.setOnAction(btnAction);
+		radialButton.setOnAction(btnAction);
+		
+		tb.getItems().addAll(linearButton, radialButton);
+		root.setTop(tb);
+		
 	}
 
 	private void configureStage(){
@@ -55,7 +97,7 @@ public class GradientBuilderApp extends Application {
 		this.scene.getStylesheets().add("styles/gradientbuilder.css");
 	}
 
-	private void configure() {
+	private void configureCenter() {
 		ScrollPane rightPane = configureGradientSettings();
 		StackPane topPane = configureTopPane();
 		StackPane bottomPane = configureBottomPane();
@@ -72,11 +114,29 @@ public class GradientBuilderApp extends Application {
 	
 	private StackPane configureTopPane(){
 		
-		rectangle = RectangleBuilder.create().build();
-		StackPane sp = StackPaneBuilder.create()
-									   .style("-fx-background-color:yellow;")
+		rectangle = RectangleBuilder.create().style("-fx-fill:yellow;").build();
+		final StackPane sp = StackPaneBuilder.create().alignment(Pos.CENTER)
+										.children(rectangle)
 									   .build();
 
+		rectangle.heightProperty().bind(new DoubleBinding() {
+			{
+				bind(sp.heightProperty());
+			}
+			@Override
+			protected double computeValue() {
+				return sp.getHeight()-20d;
+			}
+		});
+		rectangle.widthProperty().bind(new DoubleBinding() {
+			{
+				bind(sp.widthProperty());
+			}
+			@Override
+			protected double computeValue() {
+				return sp.getWidth()-20d;
+			}
+		});
 		StackPane topPane = StackPaneBuilder.create()
 											.padding(new Insets(15))
 											.children(sp)
@@ -85,10 +145,31 @@ public class GradientBuilderApp extends Application {
 	}
 	
 	private StackPane configureBottomPane(){
-		circle = CircleBuilder.create().build();
-		StackPane sp = StackPaneBuilder.create()
-								  .style("-fx-background-color:yellow;")
-								  .build();
+		
+		
+		circle = EllipseBuilder.create().style("-fx-fill:yellow;").radiusX(20).radiusY(30).build();
+		final StackPane sp = StackPaneBuilder.create().alignment(Pos.CENTER)
+													  .children(circle)
+													  .build();
+
+		circle.radiusXProperty().bind(new DoubleBinding() {
+			{
+				bind(sp.widthProperty());
+			}
+			@Override
+			protected double computeValue() {
+				return sp.getWidth()/2-10d;
+			}
+		});
+		circle.radiusYProperty().bind(new DoubleBinding() {
+			{
+				bind(sp.heightProperty());
+			}
+			@Override
+			protected double computeValue() {
+				return sp.getHeight()/2-10d;
+			}
+		});
 		
 		StackPane bottomPane = StackPaneBuilder.create()
 											.padding(new Insets(15))
