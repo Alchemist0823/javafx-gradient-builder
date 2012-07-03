@@ -3,20 +3,30 @@ package com.javafx.gradientbuilder.application;
 
 import javafx.application.Application;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.StringBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPaneBuilder;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ToolBarBuilder;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.EllipseBuilder;
@@ -30,10 +40,12 @@ public class GradientBuilderApp extends Application {
 	Scene scene;
 	BorderPane root;
 	
-	Rectangle rectangle;
-	Ellipse circle;
+	StackPane rectangle;
+	StackPane circle;
 	
 	enum GradientType { LINEAR, RADIAL };
+	ObservableList<ColorStopDTO> colorStops = FXCollections.observableArrayList();
+	VBox colorStopsVB;
 	
 	// Properties
 	private GradientType gradientType = GradientType.LINEAR;
@@ -114,66 +126,58 @@ public class GradientBuilderApp extends Application {
 	
 	private StackPane configureTopPane(){
 		
-		rectangle = RectangleBuilder.create().style("-fx-fill:yellow;").build();
-		final StackPane sp = StackPaneBuilder.create().alignment(Pos.CENTER)
-										.children(rectangle)
-									   .build();
+		final StackPane rectangle = StackPaneBuilder.create().alignment(Pos.CENTER)
+										.style("-fx-background-color:yellow;")
+										.build();
 
-		rectangle.heightProperty().bind(new DoubleBinding() {
-			{
-				bind(sp.heightProperty());
-			}
-			@Override
-			protected double computeValue() {
-				return sp.getHeight()-20d;
-			}
-		});
-		rectangle.widthProperty().bind(new DoubleBinding() {
-			{
-				bind(sp.widthProperty());
-			}
-			@Override
-			protected double computeValue() {
-				return sp.getWidth()-20d;
-			}
-		});
 		StackPane topPane = StackPaneBuilder.create()
 											.padding(new Insets(15))
-											.children(sp)
+											.children(rectangle)
 											.build();
 		return topPane;
 	}
 	
 	private StackPane configureBottomPane(){
 		
-		
-		circle = EllipseBuilder.create().style("-fx-fill:yellow;").radiusX(20).radiusY(30).build();
-		final StackPane sp = StackPaneBuilder.create().alignment(Pos.CENTER)
-													  .children(circle)
-													  .build();
+		circle = StackPaneBuilder.create().alignment(Pos.CENTER)
+										  .styleClass("circle-shape")
+										  .style("-fx-background-color:yellow;")
+										  .build();
 
-		circle.radiusXProperty().bind(new DoubleBinding() {
+		
+		HBox hb = new HBox();
+		hb.setAlignment(Pos.CENTER_RIGHT);
+		hb.setPrefHeight(20);
+		Label radiusX = new Label();
+		radiusX.textProperty().bind(new StringBinding() {
 			{
-				bind(sp.widthProperty());
+				bind(circle.widthProperty());
 			}
 			@Override
-			protected double computeValue() {
-				return sp.getWidth()/2-10d;
+			protected String computeValue() {
+				return (circle.getWidth())/2+"px";
 			}
 		});
-		circle.radiusYProperty().bind(new DoubleBinding() {
+		
+		Label radiusY = new Label();
+		radiusY.textProperty().bind(new StringBinding() {
 			{
-				bind(sp.heightProperty());
+				bind(circle.heightProperty());
 			}
 			@Override
-			protected double computeValue() {
-				return sp.getHeight()/2-10d;
+			protected String computeValue() {
+				return ((circle.getHeight()/2))+"px";
 			}
 		});
+		hb.getChildren().addAll(new Label("X-Radius : "), radiusX, new Label("Y-Radius : "),radiusY);
+		
+		BorderPane bp = new BorderPane();
+		bp.setCenter(circle);
+		bp.setBottom(hb);
 		
 		StackPane bottomPane = StackPaneBuilder.create()
-											.padding(new Insets(15))
-											.children(sp)
+											.padding(new Insets(10))
+											.children(bp)
 											.build();
 		return bottomPane;
 	}
@@ -184,9 +188,13 @@ public class GradientBuilderApp extends Application {
 	 * @return ScrollPane
 	 */
 	private ScrollPane configureGradientSettings(){
-		StackPane cont = StackPaneBuilder.create().minHeight(900)
-									.minWidth(700)
-									.children(new ColorPicker()).build();
+		colorStopsVB = VBoxBuilder.create().spacing(15).build();
+		for (int i = 0; i < 5; i++) {
+			colorStopsVB.getChildren().add(getColorStopTemplate(0, 100, 0));
+		}
+		StackPane cont = StackPaneBuilder.create()
+									.alignment(Pos.CENTER)
+									.children(colorStopsVB).build();
 		
 		ScrollPane scroll = ScrollPaneBuilder.create()
 				                             .styleClass("builder-scroll-pane")
@@ -197,6 +205,27 @@ public class GradientBuilderApp extends Application {
 		return scroll;
 	}
 
-	
+	private HBox getColorStopTemplate(int startValue, int endValue, int pos){
+		ColorStopDTO dto = new ColorStopDTO();
+		colorStops.add(dto);
+		
+		SliderTextField sliderTF = new SliderTextField(startValue, endValue, pos);
+		dto.percentProperty().bindBidirectional(sliderTF.valueProperty());
+		
+		ColorPicker colorPicker = new ColorPicker();
+		dto.colorCodeProperty().bindBidirectional(colorPicker.colorCodeProperty());
+		
+		ImageView add = new ImageView(new Image(ColorPicker.class.getResource("/images/add.png").toExternalForm()));
+		ImageView delete = new ImageView(new Image(ColorPicker.class.getResource("/images/delete.png").toExternalForm()));
+		
+		HBox hb = HBoxBuilder.create()
+							 .maxHeight(30)
+							 .spacing(20)
+							 .alignment(Pos.CENTER_LEFT)
+							 .children(colorPicker, sliderTF, StackPaneBuilder.create().alignment(Pos.CENTER_LEFT).padding(new Insets(0,0,0,20)).children(add).build(),delete)
+							 .build();
+		
+		return hb;
+	}
 }
 

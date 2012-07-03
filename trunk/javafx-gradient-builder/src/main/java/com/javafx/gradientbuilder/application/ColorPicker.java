@@ -40,6 +40,7 @@ public class ColorPicker extends HBox{
 	
 	private void configure(){
 		super.setMaxHeight(24);
+		super.setMinWidth(85);
 		super.setSpacing(3);
 		
 		
