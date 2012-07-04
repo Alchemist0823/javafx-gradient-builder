@@ -2,20 +2,24 @@ package com.javafx.gradientbuilder.application;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPaneBuilder;
 
 public class SliderTextField extends HBox{
 	private SimpleIntegerProperty value = new SimpleIntegerProperty();
 	
 	private final int startValue;
 	private final int endValue;
+	private SimpleStringProperty lbl = new SimpleStringProperty();
 	
 	public SliderTextField(int startValue, int endValue, int pos){
 		super();
@@ -23,6 +27,11 @@ public class SliderTextField extends HBox{
 		this.endValue = endValue;
 		value.set(pos);
 		configure();
+	}
+	
+	public SliderTextField(int startValue, int endValue, int pos, String label){
+		this(startValue, endValue, pos);
+		lbl.set(label);
 	}
 	
 	private void configure(){
@@ -40,7 +49,12 @@ public class SliderTextField extends HBox{
 		value.bindBidirectional(intField.valueProperty());
 		
 	    intField.setPrefWidth(50);
-	    getChildren().addAll(intField, slider);
+	    
+	    Label label = new Label();
+	    label.setStyle("-fx-font-style:italic;");
+	    label.textProperty().bind(lbl);
+	    
+	    getChildren().addAll(intField, StackPaneBuilder.create().children(label).prefWidth(30).alignment(Pos.CENTER_LEFT).build(), slider);
 	}
 	
 	public SimpleIntegerProperty valueProperty(){

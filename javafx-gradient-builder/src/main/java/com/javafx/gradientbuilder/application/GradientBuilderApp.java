@@ -2,8 +2,11 @@ package com.javafx.gradientbuilder.application;
 
 
 import javafx.application.Application;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +16,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.LabelBuilder;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPaneBuilder;
 import javafx.scene.control.SplitPane;
@@ -21,6 +25,8 @@ import javafx.scene.control.ToolBarBuilder;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.GridPaneBuilder;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.StackPane;
@@ -28,10 +34,6 @@ import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.EllipseBuilder;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.RectangleBuilder;
 import javafx.stage.Stage;
 
 public class GradientBuilderApp extends Application {
@@ -46,9 +48,55 @@ public class GradientBuilderApp extends Application {
 	enum GradientType { LINEAR, RADIAL };
 	ObservableList<ColorStopDTO> colorStops = FXCollections.observableArrayList();
 	VBox colorStopsVB;
+	StackPane linearSettingLayout;
+	StackPane radialSettingLayout;
+	StackPane settingsContainer;
+	
+	private String separator=", ";
+	private String bgTxt = "-fx-background-color: ";
+	private String bgRadial = "radial-gradient(";
+	private String bgLinear = "linear-gradient(";
+	private String bgGradEnd = ");";
+	private String focusAngleStart = "focus-angle ";
+	private String focusAngleUnit = "deg ";
+	private String focusDistStart = "focus-distance ";
+	private String focusDistUnit = "% ";
+	private String centerStart = "center ";
+	private String centerUnit = "% ";
+	private String radiusStart = "radius ";
+	private String radiusPercentUnit = "% ";
+	private String radiusPixelUnit = "px ";
+	private String repeat = "repeat ";
+	private String reflect = "reflect ";
+	private String colorStopUnit="% ";
+	private String pointPercentUnit = "% ";
+	private String pointPixelUnit = "px ";
+	
+	private enum POINT {
+		TOP("top"), LEFT("left"), BOTTOM("bottom"),  RIGHT("right"), 
+		TOP_LEFT("top left"), TOP_RIGHT("top right"), 
+		BOTTOM_LEFT("bottom left"), BOTTOM_RIGHT("bottom right");
+		
+		String value;
+		POINT(String value){
+			this.value= value;
+		}
+		@Override
+		public String toString() {
+			return this.value;
+		}
+	}
+	
 	
 	// Properties
-	private GradientType gradientType = GradientType.LINEAR;
+	private SimpleObjectProperty<GradientType> gradientType = new SimpleObjectProperty<GradientType>();
+	
+	// Radial Properties
+	private SimpleIntegerProperty focusAngle = new SimpleIntegerProperty();
+	private SimpleIntegerProperty focusDistance = new SimpleIntegerProperty();
+	private SimpleIntegerProperty centerX = new SimpleIntegerProperty();
+	private SimpleIntegerProperty centerY = new SimpleIntegerProperty();
+	private SimpleIntegerProperty radius = new SimpleIntegerProperty();
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -62,6 +110,9 @@ public class GradientBuilderApp extends Application {
 		
 		configureCenter();
 		configureToolBar();
+		
+		//ScenicView.show(scene);
+		
 	}
 
 	private void configureToolBar() {
@@ -72,17 +123,33 @@ public class GradientBuilderApp extends Application {
 		
 		final CustomRadioButton radialButton = new CustomRadioButton("Radial");
 		
+		gradientType.addListener(new ChangeListener<GradientType>() {
+			@Override
+			public void changed(ObservableValue<? extends GradientType> arg0,	GradientType arg1, GradientType type) {
+				switch(type){
+				case LINEAR:
+					settingsContainer.getChildren().clear();
+					settingsContainer.getChildren().add(linearSettingLayout);
+					break;
+				case RADIAL:
+					settingsContainer.getChildren().clear();
+					settingsContainer.getChildren().add(radialSettingLayout);
+					break;
+				}
+			}
+		});
+		
 		EventHandler<ActionEvent> btnAction = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
 				if(linearButton.getSelected()){
 					linearButton.setSelected(false);
 					radialButton.setSelected(true);
-					gradientType = GradientType.RADIAL;
+					gradientType.set(GradientType.RADIAL);
 				}else{
 					linearButton.setSelected(true);
 					radialButton.setSelected(false);
-					gradientType = GradientType.LINEAR;
+					gradientType.set(GradientType.LINEAR);
 				}
 			}
 		};
@@ -91,7 +158,7 @@ public class GradientBuilderApp extends Application {
 		
 		tb.getItems().addAll(linearButton, radialButton);
 		root.setTop(tb);
-		
+		radialButton.fire();
 	}
 
 	private void configureStage(){
@@ -116,7 +183,7 @@ public class GradientBuilderApp extends Application {
 		
 		SplitPane leftPane = new SplitPane();
 		leftPane.setOrientation(Orientation.VERTICAL);
-		leftPane.getItems().addAll(topPane,bottomPane);
+		//leftPane.getItems().addAll(topPane,bottomPane);
 		
 		SplitPane mainPane = new SplitPane();
 		mainPane.getItems().addAll(leftPane,rightPane);
@@ -126,13 +193,45 @@ public class GradientBuilderApp extends Application {
 	
 	private StackPane configureTopPane(){
 		
-		final StackPane rectangle = StackPaneBuilder.create().alignment(Pos.CENTER)
+		rectangle = StackPaneBuilder.create().alignment(Pos.CENTER)
 										.style("-fx-background-color:yellow;")
 										.build();
 
+		HBox hb = HBoxBuilder.create()
+							 .alignment(Pos.CENTER_RIGHT)
+							 .prefHeight(20).build();
+		
+		Label widthLbl = getValueLabel();
+		widthLbl.textProperty().bind(new StringBinding() {
+			{
+				bind(rectangle.widthProperty());
+			}
+			@Override
+			protected String computeValue() {
+				return rectangle.getWidth()+"px";
+			}
+		});
+		
+		Label heightLbl = getValueLabel();
+		heightLbl.textProperty().bind(new StringBinding() {
+			{
+				bind(rectangle.heightProperty());
+			}
+			@Override
+			protected String computeValue() {
+				return rectangle.getHeight()+"px";
+			}
+		});
+		
+		hb.getChildren().addAll(getBoldLabel("Width : "), widthLbl, getSpacer(), getBoldLabel("Height : "), heightLbl);
+		
+		BorderPane bp = new BorderPane();
+		bp.setCenter(rectangle);
+		bp.setBottom(hb);
+		
 		StackPane topPane = StackPaneBuilder.create()
-											.padding(new Insets(15))
-											.children(rectangle)
+											.padding(new Insets(15,15,3,15))
+											.children(bp)
 											.build();
 		return topPane;
 	}
@@ -145,10 +244,11 @@ public class GradientBuilderApp extends Application {
 										  .build();
 
 		
-		HBox hb = new HBox();
-		hb.setAlignment(Pos.CENTER_RIGHT);
-		hb.setPrefHeight(20);
-		Label radiusX = new Label();
+		HBox hb = HBoxBuilder.create()
+							 .alignment(Pos.CENTER_RIGHT)
+							 .prefHeight(20).build();
+		
+		Label radiusX = getValueLabel();
 		radiusX.textProperty().bind(new StringBinding() {
 			{
 				bind(circle.widthProperty());
@@ -159,7 +259,7 @@ public class GradientBuilderApp extends Application {
 			}
 		});
 		
-		Label radiusY = new Label();
+		Label radiusY = getValueLabel();
 		radiusY.textProperty().bind(new StringBinding() {
 			{
 				bind(circle.heightProperty());
@@ -169,17 +269,32 @@ public class GradientBuilderApp extends Application {
 				return ((circle.getHeight()/2))+"px";
 			}
 		});
-		hb.getChildren().addAll(new Label("X-Radius : "), radiusX, new Label("Y-Radius : "),radiusY);
+		hb.getChildren().addAll(getBoldLabel("X-Radius : "), radiusX, getSpacer(), getBoldLabel("Y-Radius : "),radiusY);
 		
 		BorderPane bp = new BorderPane();
 		bp.setCenter(circle);
 		bp.setBottom(hb);
 		
 		StackPane bottomPane = StackPaneBuilder.create()
-											.padding(new Insets(10))
+											.padding(new Insets(15,15,3,15))
 											.children(bp)
 											.build();
 		return bottomPane;
+	}
+	
+	private StackPane getSpacer(){
+		return StackPaneBuilder.create().prefWidth(20).build();
+	}
+	
+	private Label getBoldLabel(String str){
+		return LabelBuilder.create()
+						   .text(str)
+						   .style("-fx-font-weight:bold;").build();
+	}
+	
+	private Label getValueLabel(){
+		return LabelBuilder.create()
+						   .style("-fx-font-family:verdana;").build();
 	}
 	
 	
@@ -188,21 +303,67 @@ public class GradientBuilderApp extends Application {
 	 * @return ScrollPane
 	 */
 	private ScrollPane configureGradientSettings(){
-		colorStopsVB = VBoxBuilder.create().spacing(15).build();
-		for (int i = 0; i < 5; i++) {
-			colorStopsVB.getChildren().add(getColorStopTemplate(0, 100, 0));
-		}
-		StackPane cont = StackPaneBuilder.create()
-									.alignment(Pos.CENTER)
-									.children(colorStopsVB).build();
+		radialSettingLayout = configureRadialSettings();
+		linearSettingLayout = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(new Label("Linear")).build();
 		
+		settingsContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
+
 		ScrollPane scroll = ScrollPaneBuilder.create()
 				                             .styleClass("builder-scroll-pane")
 				                             .fitToHeight(true)
 				                             .fitToWidth(true)
-				                             .content(cont)
+				                             .content(settingsContainer)
 				                             .build();
+		
+		colorStopsVB = VBoxBuilder.create().spacing(15).build();
+		for (int i = 0; i < 5; i++) {
+			colorStopsVB.getChildren().add(getColorStopTemplate(0, 100, 0));
+		}
+		
 		return scroll;
+	}
+
+	private StackPane configureRadialSettings() {
+		GridPane grid = GridPaneBuilder.create().vgap(10).build();
+		
+		int rowIndex =0;
+		/* Focus Angle*/
+		SliderTextField focusAngleField = new SliderTextField(0, 360, 0, "deg");
+		focusAngle.bindBidirectional(focusAngleField.valueProperty());
+		grid.add(new Label("Focus Angle : "), 0, rowIndex);
+		grid.add(focusAngleField, 1, rowIndex, 2, 1);
+		rowIndex++;
+		
+		/* Focus Distance*/
+		SliderTextField focusDistField = new SliderTextField(-120, 120, 0, "%");
+		focusDistance.bindBidirectional(focusDistField.valueProperty());
+		grid.add(new Label("Focus Distance : "), 0, rowIndex);
+		grid.add(focusDistField, 1, rowIndex, 2, 1);
+		rowIndex++;
+		
+		/* Center */
+		SliderTextField centerXField = new SliderTextField(-120, 120, 50, "%");
+		centerX.bindBidirectional(centerXField.valueProperty());
+		grid.add(new Label("Center : "), 0, rowIndex);
+		grid.add(new Label("X : "), 1, rowIndex);
+		grid.add(centerXField, 2, rowIndex);
+		rowIndex++;
+		
+		SliderTextField centerYField = new SliderTextField(-120, 120, 50, "%");
+		centerY.bindBidirectional(centerYField.valueProperty());
+		grid.add(new Label("Y : "), 1, rowIndex);
+		grid.add(centerYField, 2, rowIndex);
+		rowIndex++;
+		
+		/* Radius */
+		SliderTextField radiusField = new SliderTextField(0, 120, 0, "%");
+		radius.bindBidirectional(radiusField.valueProperty());
+		grid.add(new Label("Radius : "), 0, rowIndex);
+		grid.add(radiusField, 1, rowIndex, 2, 1);
+		rowIndex++;
+		
+		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
+		return cont;
 	}
 
 	private HBox getColorStopTemplate(int startValue, int endValue, int pos){
