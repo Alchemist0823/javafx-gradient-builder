@@ -52,51 +52,9 @@ public class GradientBuilderApp extends Application {
 	StackPane radialSettingLayout;
 	StackPane settingsContainer;
 	
-	private String separator=", ";
-	private String bgTxt = "-fx-background-color: ";
-	private String bgRadial = "radial-gradient(";
-	private String bgLinear = "linear-gradient(";
-	private String bgGradEnd = ");";
-	private String focusAngleStart = "focus-angle ";
-	private String focusAngleUnit = "deg ";
-	private String focusDistStart = "focus-distance ";
-	private String focusDistUnit = "% ";
-	private String centerStart = "center ";
-	private String centerUnit = "% ";
-	private String radiusStart = "radius ";
-	private String radiusPercentUnit = "% ";
-	private String radiusPixelUnit = "px ";
-	private String repeat = "repeat ";
-	private String reflect = "reflect ";
-	private String colorStopUnit="% ";
-	private String pointPercentUnit = "% ";
-	private String pointPixelUnit = "px ";
-	
-	private enum POINT {
-		TOP("top"), LEFT("left"), BOTTOM("bottom"),  RIGHT("right"), 
-		TOP_LEFT("top left"), TOP_RIGHT("top right"), 
-		BOTTOM_LEFT("bottom left"), BOTTOM_RIGHT("bottom right");
-		
-		String value;
-		POINT(String value){
-			this.value= value;
-		}
-		@Override
-		public String toString() {
-			return this.value;
-		}
-	}
-	
-	
-	// Properties
+		// Properties
 	private SimpleObjectProperty<GradientType> gradientType = new SimpleObjectProperty<GradientType>();
 	
-	// Radial Properties
-	private SimpleIntegerProperty focusAngle = new SimpleIntegerProperty();
-	private SimpleIntegerProperty focusDistance = new SimpleIntegerProperty();
-	private SimpleIntegerProperty centerX = new SimpleIntegerProperty();
-	private SimpleIntegerProperty centerY = new SimpleIntegerProperty();
-	private SimpleIntegerProperty radius = new SimpleIntegerProperty();
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -177,13 +135,13 @@ public class GradientBuilderApp extends Application {
 	}
 
 	private void configureCenter() {
-		ScrollPane rightPane = configureGradientSettings();
 		StackPane topPane = configureTopPane();
 		StackPane bottomPane = configureBottomPane();
+		ScrollPane rightPane = configureGradientSettings();
 		
 		SplitPane leftPane = new SplitPane();
 		leftPane.setOrientation(Orientation.VERTICAL);
-		//leftPane.getItems().addAll(topPane,bottomPane);
+		leftPane.getItems().addAll(topPane,bottomPane);
 		
 		SplitPane mainPane = new SplitPane();
 		mainPane.getItems().addAll(leftPane,rightPane);
@@ -324,43 +282,7 @@ public class GradientBuilderApp extends Application {
 	}
 
 	private StackPane configureRadialSettings() {
-		GridPane grid = GridPaneBuilder.create().vgap(10).build();
-		
-		int rowIndex =0;
-		/* Focus Angle*/
-		SliderTextField focusAngleField = new SliderTextField(0, 360, 0, "deg");
-		focusAngle.bindBidirectional(focusAngleField.valueProperty());
-		grid.add(new Label("Focus Angle : "), 0, rowIndex);
-		grid.add(focusAngleField, 1, rowIndex, 2, 1);
-		rowIndex++;
-		
-		/* Focus Distance*/
-		SliderTextField focusDistField = new SliderTextField(-120, 120, 0, "%");
-		focusDistance.bindBidirectional(focusDistField.valueProperty());
-		grid.add(new Label("Focus Distance : "), 0, rowIndex);
-		grid.add(focusDistField, 1, rowIndex, 2, 1);
-		rowIndex++;
-		
-		/* Center */
-		SliderTextField centerXField = new SliderTextField(-120, 120, 50, "%");
-		centerX.bindBidirectional(centerXField.valueProperty());
-		grid.add(new Label("Center : "), 0, rowIndex);
-		grid.add(new Label("X : "), 1, rowIndex);
-		grid.add(centerXField, 2, rowIndex);
-		rowIndex++;
-		
-		SliderTextField centerYField = new SliderTextField(-120, 120, 50, "%");
-		centerY.bindBidirectional(centerYField.valueProperty());
-		grid.add(new Label("Y : "), 1, rowIndex);
-		grid.add(centerYField, 2, rowIndex);
-		rowIndex++;
-		
-		/* Radius */
-		SliderTextField radiusField = new SliderTextField(0, 120, 0, "%");
-		radius.bindBidirectional(radiusField.valueProperty());
-		grid.add(new Label("Radius : "), 0, rowIndex);
-		grid.add(radiusField, 1, rowIndex, 2, 1);
-		rowIndex++;
+		GridPane grid = new RadialSettingsLayout(this);
 		
 		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
 		return cont;
@@ -387,6 +309,12 @@ public class GradientBuilderApp extends Application {
 							 .build();
 		
 		return hb;
+	}
+	
+	public void applyStyles(String bg){
+		rectangle.setStyle("-fx-background-color:"+bg);
+		circle.setStyle("-fx-background-color:"+bg);
+		
 	}
 }
 
