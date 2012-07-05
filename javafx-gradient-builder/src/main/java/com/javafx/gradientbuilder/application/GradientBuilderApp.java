@@ -46,8 +46,7 @@ public class GradientBuilderApp extends Application {
 	StackPane circle;
 	
 	enum GradientType { LINEAR, RADIAL };
-	ObservableList<ColorStopDTO> colorStops = FXCollections.observableArrayList();
-	VBox colorStopsVB;
+	
 	StackPane linearSettingLayout;
 	StackPane radialSettingLayout;
 	StackPane settingsContainer;
@@ -273,10 +272,7 @@ public class GradientBuilderApp extends Application {
 				                             .content(settingsContainer)
 				                             .build();
 		
-		colorStopsVB = VBoxBuilder.create().spacing(15).build();
-		for (int i = 0; i < 5; i++) {
-			colorStopsVB.getChildren().add(getColorStopTemplate(0, 100, 0));
-		}
+		
 		
 		return scroll;
 	}
@@ -288,29 +284,6 @@ public class GradientBuilderApp extends Application {
 		return cont;
 	}
 
-	private HBox getColorStopTemplate(int startValue, int endValue, int pos){
-		ColorStopDTO dto = new ColorStopDTO();
-		colorStops.add(dto);
-		
-		SliderTextField sliderTF = new SliderTextField(startValue, endValue, pos);
-		dto.percentProperty().bindBidirectional(sliderTF.valueProperty());
-		
-		ColorPicker colorPicker = new ColorPicker();
-		dto.colorCodeProperty().bindBidirectional(colorPicker.colorCodeProperty());
-		
-		ImageView add = new ImageView(new Image(ColorPicker.class.getResource("/images/add.png").toExternalForm()));
-		ImageView delete = new ImageView(new Image(ColorPicker.class.getResource("/images/delete.png").toExternalForm()));
-		
-		HBox hb = HBoxBuilder.create()
-							 .maxHeight(30)
-							 .spacing(20)
-							 .alignment(Pos.CENTER_LEFT)
-							 .children(colorPicker, sliderTF, StackPaneBuilder.create().alignment(Pos.CENTER_LEFT).padding(new Insets(0,0,0,20)).children(add).build(),delete)
-							 .build();
-		
-		return hb;
-	}
-	
 	public void applyStyles(String bg){
 		rectangle.setStyle("-fx-background-color:"+bg);
 		circle.setStyle("-fx-background-color:"+bg);

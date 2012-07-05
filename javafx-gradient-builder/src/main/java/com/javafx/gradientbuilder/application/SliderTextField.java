@@ -1,6 +1,7 @@
 package com.javafx.gradientbuilder.application;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -20,6 +21,7 @@ public class SliderTextField extends HBox{
 	private final int startValue;
 	private final int endValue;
 	private SimpleStringProperty lbl = new SimpleStringProperty();
+	private SimpleBooleanProperty disabled = new SimpleBooleanProperty();
 	
 	public SliderTextField(int startValue, int endValue, int pos){
 		super();
@@ -41,10 +43,11 @@ public class SliderTextField extends HBox{
 		super.setSpacing(5);
 		
 		Slider slider = new Slider(startValue, endValue, value.get());
+		slider.disableProperty().bind(disabled);
 		//slider.setShowTickLabels(true);
 		
 		IntField intField = new IntField(startValue, endValue, value.get());
-		
+		intField.disableProperty().bind(disabled);
 		intField.valueProperty().bindBidirectional(slider.valueProperty());
 		value.bindBidirectional(intField.valueProperty());
 		
@@ -59,6 +62,10 @@ public class SliderTextField extends HBox{
 	
 	public SimpleIntegerProperty valueProperty(){
 		return this.value;
+	}
+	
+	public SimpleBooleanProperty sliderDisableProperty(){
+		return this.disabled;
 	}
 	
 	/**
