@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public interface SyntaxConstants {
+	public String spacer=" ";
 	public String separator=", ";
 	public String bgTxt = "-fx-background-color: ";
 	public String bgRadial = "radial-gradient(";
@@ -40,7 +41,7 @@ public interface SyntaxConstants {
 	}
 	
 	public enum REPEAT {
-		REPEAT("repeat"), REFLECT("reflect");
+		NONE("None"),REPEAT("repeat"), REFLECT("reflect");
 		
 		String value;
 		REPEAT(String value){
