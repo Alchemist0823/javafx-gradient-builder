@@ -47,8 +47,8 @@ public class GradientBuilderApp extends Application {
 	
 	enum GradientType { LINEAR, RADIAL };
 	
-	StackPane linearSettingLayout;
-	StackPane radialSettingLayout;
+	LinearSettingsLayout linearSettingLayout;
+	RadialSettingsLayout radialSettingLayout;
 	StackPane settingsContainer;
 	
 		// Properties
@@ -87,10 +87,12 @@ public class GradientBuilderApp extends Application {
 				case LINEAR:
 					settingsContainer.getChildren().clear();
 					settingsContainer.getChildren().add(linearSettingLayout);
+					linearSettingLayout.buildGradient();
 					break;
 				case RADIAL:
 					settingsContainer.getChildren().clear();
 					settingsContainer.getChildren().add(radialSettingLayout);
+					radialSettingLayout.buildGradient();
 					break;
 				}
 			}
@@ -260,8 +262,8 @@ public class GradientBuilderApp extends Application {
 	 * @return ScrollPane
 	 */
 	private ScrollPane configureGradientSettings(){
-		radialSettingLayout = configureRadialSettings();
-		linearSettingLayout = configureLinearSettings();
+		radialSettingLayout = new RadialSettingsLayout(this);
+		linearSettingLayout = new LinearSettingsLayout(this);
 		
 		settingsContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
 		ScrollPane scroll = ScrollPaneBuilder.create()
@@ -271,18 +273,6 @@ public class GradientBuilderApp extends Application {
 				                             .content(settingsContainer)
 				                             .build();
 		return scroll;
-	}
-
-	private StackPane configureLinearSettings() {
-		VBox grid = new LinearSettingsLayout(this);
-		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
-		return cont;
-	}
-
-	private StackPane configureRadialSettings() {
-		VBox grid = new RadialSettingsLayout(this);
-		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
-		return cont;
 	}
 
 	public void applyStyles(String bg){

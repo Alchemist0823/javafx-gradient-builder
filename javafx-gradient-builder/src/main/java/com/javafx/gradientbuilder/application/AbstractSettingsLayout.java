@@ -19,12 +19,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBox;
 
 import com.javafx.gradientbuilder.application.SyntaxConstants.RepeatOrReflect;
 
-public abstract class AbstractSettingsLayout extends VBox{
+public abstract class AbstractSettingsLayout extends StackPane{
 	
 	protected GradientBuilderApp app;
 	protected SimpleStringProperty gradientSyntax = new SimpleStringProperty("");
@@ -33,6 +34,7 @@ public abstract class AbstractSettingsLayout extends VBox{
 	protected SimpleObjectProperty<RepeatOrReflect> repeatReflect = new SimpleObjectProperty<RepeatOrReflect>();
 	protected ObservableList<ColorStopDTO> colorStops = FXCollections.observableArrayList();
 	
+	protected VBox layout;
 	protected VBox colorStopsVB;
 	protected GridPane grid;
 	
@@ -45,8 +47,11 @@ public abstract class AbstractSettingsLayout extends VBox{
 	
 	public AbstractSettingsLayout() {
 		super();
-		setSpacing(10);
-		setPadding(new Insets(10));
+		setAlignment(Pos.TOP_LEFT);
+		layout = new VBox();
+		layout.setSpacing(10);
+		layout.setPadding(new Insets(10));
+		getChildren().add(layout);
 	}
 
 	protected abstract void buildGradient();
