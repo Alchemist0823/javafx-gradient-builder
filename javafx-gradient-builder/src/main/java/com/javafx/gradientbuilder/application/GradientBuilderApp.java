@@ -120,7 +120,7 @@ public class GradientBuilderApp extends Application {
 
 	private void configureStage(){
 		stage.setTitle("Gradient Builder");
-		stage.setWidth(980);
+		stage.setWidth(1200);
 	    stage.setHeight(650);
 	    stage.setScene(this.scene);
 	    stage.show();
@@ -261,25 +261,26 @@ public class GradientBuilderApp extends Application {
 	 */
 	private ScrollPane configureGradientSettings(){
 		radialSettingLayout = configureRadialSettings();
-		linearSettingLayout = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(new Label("Linear")).build();
+		linearSettingLayout = configureLinearSettings();
 		
 		settingsContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
-
 		ScrollPane scroll = ScrollPaneBuilder.create()
 				                             .styleClass("builder-scroll-pane")
 				                             .fitToHeight(true)
 				                             .fitToWidth(true)
 				                             .content(settingsContainer)
 				                             .build();
-		
-		
-		
 		return scroll;
 	}
 
+	private StackPane configureLinearSettings() {
+		VBox grid = new LinearSettingsLayout(this);
+		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
+		return cont;
+	}
+
 	private StackPane configureRadialSettings() {
-		GridPane grid = new RadialSettingsLayout(this);
-		
+		VBox grid = new RadialSettingsLayout(this);
 		StackPane cont = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).children(grid).build();
 		return cont;
 	}

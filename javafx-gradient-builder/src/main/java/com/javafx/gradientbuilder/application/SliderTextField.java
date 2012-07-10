@@ -28,6 +28,7 @@ public class SliderTextField extends HBox{
 		this.startValue = startValue;
 		this.endValue = endValue;
 		value.set(pos);
+		setMinHeight(26);
 		configure();
 	}
 	

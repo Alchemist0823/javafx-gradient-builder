@@ -24,15 +24,21 @@ public interface SyntaxConstants {
 	public String colorStopUnit="% ";
 	public String pointPercentUnit = "% ";
 	public String pointPixelUnit = "px ";
+	public String from ="from ";
+	public String to ="to ";
 	
-	public enum POINT {
-		TOP("top"), LEFT("left"), BOTTOM("bottom"),  RIGHT("right"), 
-		TOP_LEFT("top left"), TOP_RIGHT("top right"), 
-		BOTTOM_LEFT("bottom left"), BOTTOM_RIGHT("bottom right");
+	public enum RepeatOrReflect {
+		NONE("None"),REPEAT("repeat"), REFLECT("reflect");
 		
 		String value;
-		POINT(String value){
+		RepeatOrReflect(String value){
 			this.value= value;
+		}
+		
+		public static ObservableList<RepeatOrReflect> getList(){
+			ObservableList<RepeatOrReflect> list = FXCollections.observableArrayList();
+			list.addAll(RepeatOrReflect.values());
+			return list;
 		}
 		@Override
 		public String toString() {
@@ -40,19 +46,22 @@ public interface SyntaxConstants {
 		}
 	}
 	
-	public enum REPEAT {
-		NONE("None"),REPEAT("repeat"), REFLECT("reflect");
+	public enum LinearDirection{
+		TOP("top"), LEFT("left"), BOTTOM("bottom"), RIGHT("right"),
+		TOP_LEFT("top left"), TOP_RIGHT("top right"),
+		BOTTOM_LEFT("bottom left"), BOTTOM_RIGHT("bottom right");
 		
 		String value;
-		REPEAT(String value){
+		LinearDirection(String value){
 			this.value= value;
 		}
 		
-		public static ObservableList<REPEAT> getList(){
-			ObservableList<REPEAT> list = FXCollections.observableArrayList();
-			list.addAll(REPEAT.values());
+		public static ObservableList<LinearDirection> getList(){
+			ObservableList<LinearDirection> list = FXCollections.observableArrayList();
+			list.addAll(LinearDirection.values());
 			return list;
 		}
+		
 		@Override
 		public String toString() {
 			return this.value;
