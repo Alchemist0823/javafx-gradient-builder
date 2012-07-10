@@ -70,11 +70,11 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		/* Output TextArea*/
 		TextArea textArea = TextAreaBuilder.create().prefHeight(100).minHeight(60).wrapText(true).build();
 		textArea.textProperty().bind(gradientSyntax);
-		getChildren().addAll(outputHeading, textArea);
+		layout.getChildren().addAll(outputHeading, textArea);
 		
 		/* Settings Heading*/
 		Label settingsHeading = LabelBuilder.create().text("Settings :").styleClass("heading1").build();
-		getChildren().addAll(settingsHeading, this.grid);
+		layout.getChildren().addAll(settingsHeading, this.grid);
 		
 		int rowIndex =0;
 		
@@ -130,7 +130,7 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 				                                ColumnConstraintsBuilder.create().minWidth(110).build()  );
 	}
 
-	protected void buildGradient() {
+	public void buildGradient() {
 		StringBuilder sytx = new StringBuilder(bgLinear);
 		
 		// From

@@ -57,11 +57,11 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		/* Output TextArea*/
 		TextArea outputText = TextAreaBuilder.create().prefHeight(100).minHeight(60).wrapText(true).build();
 		outputText.textProperty().bind(gradientSyntax);
-		getChildren().addAll(outputHeading, outputText);
+		layout.getChildren().addAll(outputHeading, outputText);
 		
 		/* Settings Heading*/
 		Label settingsHeading = LabelBuilder.create().text("Settings :").styleClass("heading1").build();
-		getChildren().addAll(settingsHeading, this.grid);
+		layout.getChildren().addAll(settingsHeading, this.grid);
 		
 		int rowIndex =0;
 		/* Focus Angle*/
@@ -149,7 +149,7 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 	}
 	
 	
-	protected void buildGradient() {
+	public void buildGradient() {
 		StringBuilder sytx = new StringBuilder(bgRadial);
 		
 		// Focus Angle
