@@ -1,21 +1,28 @@
 package com.javafx.gradientbuilder.application;
 
-import com.javafx.gradientbuilder.application.SyntaxConstants.LinearDirection;
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.LabelBuilder;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.RadioButtonBuilder;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextAreaBuilder;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraintsBuilder;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
 
 
@@ -82,10 +89,58 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		CheckBox fromCB = new CheckBox();
 		fromCB.selectedProperty().bindBidirectional(isFrom);
 		
+		ToggleGroup grp = new ToggleGroup();
+		RadioButton percentBtn = RadioButtonBuilder.create().id("per").text("Percentage").toggleGroup(grp).build();
+		RadioButton pixelBtn = RadioButtonBuilder.create().id("pix").text("Pixel").toggleGroup(grp).build();
+		percentBtn.disableProperty().bind(fromCB.selectedProperty().not());
+		pixelBtn.disableProperty().bind(fromCB.selectedProperty().not());
+		
 		this.grid.add(fromCB, 0, rowIndex);
 		this.grid.add(new Label("From : "), 1, rowIndex);
-		//this.grid.add(fromChoice, 2, rowIndex);
+		this.grid.add(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).spacing(10).children(percentBtn,pixelBtn).build(), 2, rowIndex);
 		rowIndex++;
+		
+		// From Percent Container fields
+		SliderTextField fromXPercentField = new SliderTextField(-120, 120, 0, "%");
+		fromXPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromXPercent.bindBidirectional(fromXPercentField.valueProperty());
+		
+		SliderTextField fromYPercentField = new SliderTextField(-120, 120, 0, "%");
+		fromYPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromYPercent.bindBidirectional(fromYPercentField.valueProperty());
+		
+		final VBox fromPercentLayout = new VBox();
+		fromPercentLayout.getChildren().addAll(fromXPercentField, fromYPercentField);
+		
+		// From Pixel Container fields
+		SliderTextField fromXPixelField = new SliderTextField(-120, 120, 0, "px");
+		fromXPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromXPixel.bindBidirectional(fromXPixelField.valueProperty());
+		
+		SliderTextField fromYPixelField = new SliderTextField(-120, 120, 0, "px");
+		fromYPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromYPixel.bindBidirectional(fromYPixelField.valueProperty());
+		
+		final VBox fromPixelLayout = new VBox();
+		fromPixelLayout.getChildren().addAll(fromXPixelField, fromYPixelField);
+		
+		final StackPane fromContainer = new StackPane();
+		
+		this.grid.add(fromContainer, 2, rowIndex);
+		rowIndex++;
+		
+		grp.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			public void changed(ObservableValue<? extends Toggle> arg0,	Toggle arg1, Toggle arg2) {
+				RadioButton btn = (RadioButton)arg2;
+				fromContainer.getChildren().clear();
+				if(btn.getId().equals("per")){
+					fromContainer.getChildren().add(fromPercentLayout);
+				}else{
+					fromContainer.getChildren().add(fromPixelLayout);
+				}
+			}
+		});
+		grp.selectToggle(percentBtn);
 		
 		/* To */
 		CheckBox toCB = new CheckBox();
@@ -121,7 +176,7 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 										  getColorStopTemplate(0, 100, 0, -1));
 		
 		this.grid.add(StackPaneBuilder.create().alignment(Pos.TOP_LEFT).padding(new Insets(5,0,0,0)).children(new Label("Color Stops : ")).build(), 1, rowIndex);
-		this.grid.add(colorStopsVB, 2, rowIndex, 2, 1);
+		this.grid.add(colorStopsVB, 2, rowIndex);
 		rowIndex++;
 		
 		checkForDeleteBtn();
