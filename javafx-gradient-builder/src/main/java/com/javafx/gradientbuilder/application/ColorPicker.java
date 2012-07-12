@@ -43,9 +43,25 @@ public class ColorPicker extends HBox{
 		super.setMinWidth(85);
 		super.setSpacing(3);
 		
-		
 		textField = new ColorTextField();
-		colorCode.bindBidirectional(textField.textProperty());
+		colorCode.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0,	String arg1, String arg2) {
+				textField.setText(arg2);
+			}
+		});
+		textField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0,	String arg1, String newTxt) {
+				System.out.println(newTxt);
+				// If the new text length is exceeded.
+				if((newTxt.indexOf("#") == 0) && (newTxt.length()==7) ){
+					colorCode.set(newTxt);
+				}else if((newTxt.indexOf("#") == -1) && (newTxt.length()==6)){
+					colorCode.set(newTxt);
+				}
+			}
+		});
 		
 		ImageView palette = new ImageView(new Image(ColorPicker.class.getResource("/images/palette.png").toExternalForm()));
 		palette.setCursor(Cursor.HAND);

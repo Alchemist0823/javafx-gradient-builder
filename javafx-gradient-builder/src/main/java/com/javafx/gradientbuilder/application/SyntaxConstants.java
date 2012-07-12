@@ -25,7 +25,11 @@ public interface SyntaxConstants {
 	public String pointPercentUnit = "% ";
 	public String pointPixelUnit = "px ";
 	public String from ="from ";
+	public String fromPixelUnit ="px ";
+	public String fromPercentUnit ="% ";
 	public String to ="to ";
+	public String toPixelUnit ="px ";
+	public String toPercentUnit ="% ";
 	
 	public enum RepeatOrReflect {
 		NONE("None"),REPEAT("repeat"), REFLECT("reflect");
