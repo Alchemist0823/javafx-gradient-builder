@@ -5,8 +5,10 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -20,6 +22,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraintsBuilder;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.RowConstraintsBuilder;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBox;
@@ -28,7 +31,7 @@ import javafx.scene.layout.VBoxBuilder;
 
 public class LinearSettingsLayout extends AbstractSettingsLayout implements SyntaxConstants{
 
-	protected SimpleBooleanProperty isFrom = new SimpleBooleanProperty(true);
+	protected SimpleBooleanProperty isFrom = new SimpleBooleanProperty();
 	protected SimpleBooleanProperty isFromPixel = new SimpleBooleanProperty();
 	protected SimpleIntegerProperty fromXPixel = new SimpleIntegerProperty();
 	protected SimpleIntegerProperty fromYPixel = new SimpleIntegerProperty();
@@ -41,6 +44,17 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 	protected SimpleIntegerProperty toXPercent = new SimpleIntegerProperty();
 	protected SimpleIntegerProperty toYPercent = new SimpleIntegerProperty();
 	protected SimpleObjectProperty<LinearDirection> toDirection = new SimpleObjectProperty<LinearDirection>();
+	
+	int rowIndex =0;
+	ToggleGroup grp;
+	StackPane fromContainer;
+	StackPane toContainer;
+	VBox fromPercentLayout;
+	VBox fromPixelLayout;
+	VBox toPercentLayout;
+	VBox toPixelLayout;
+	ChoiceBox<LinearDirection> toChoice;
+	CheckBox toCB;
 	
 	public LinearSettingsLayout(GradientBuilderApp app){
 		super();
@@ -83,122 +97,29 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		Label settingsHeading = LabelBuilder.create().text("Settings :").styleClass("heading1").build();
 		layout.getChildren().addAll(settingsHeading, this.grid);
 		
-		int rowIndex =0;
 		
-		/* From */
-		CheckBox fromCB = new CheckBox();
-		fromCB.selectedProperty().bindBidirectional(isFrom);
+		configureFrom();
+		configureTo();
 		
-		ToggleGroup grp = new ToggleGroup();
-		RadioButton percentBtn = RadioButtonBuilder.create().id("per").text("Percentage").toggleGroup(grp).build();
-		RadioButton pixelBtn = RadioButtonBuilder.create().id("pix").text("Pixel").toggleGroup(grp).build();
-		percentBtn.disableProperty().bind(fromCB.selectedProperty().not());
-		pixelBtn.disableProperty().bind(fromCB.selectedProperty().not());
-		
-		this.grid.add(fromCB, 0, rowIndex);
-		this.grid.add(new Label("From : "), 1, rowIndex);
-		this.grid.add(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).spacing(10).children(percentBtn,pixelBtn).build(), 2, rowIndex);
-		rowIndex++;
-		
-		// From Percent Container fields
-		Label fromXPercentLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
-		SliderTextField fromXPercentField = new SliderTextField(-120, 120, 0, "%");
-		fromXPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
-		fromXPercent.bindBidirectional(fromXPercentField.valueProperty());
-		
-		Label fromYPercentLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
-		SliderTextField fromYPercentField = new SliderTextField(-120, 120, 0, "%");
-		fromYPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
-		fromYPercent.bindBidirectional(fromYPercentField.valueProperty());
-		
-		final VBox fromPercentLayout = new VBox();
-		fromPercentLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromXPercentLabel,fromXPercentField).build(), 
-				                               HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromYPercentLabel,fromYPercentField).build());
-		
-		// From Pixel Container fields
-		Label fromXPixelLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
-		SliderTextField fromXPixelField = new SliderTextField(-120, 120, 0, "px");
-		fromXPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
-		fromXPixel.bindBidirectional(fromXPixelField.valueProperty());
-		
-		Label fromYPixelLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
-		SliderTextField fromYPixelField = new SliderTextField(-120, 120, 0, "px");
-		fromYPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
-		fromYPixel.bindBidirectional(fromYPixelField.valueProperty());
-		
-		final VBox fromPixelLayout = new VBox();
-		fromPixelLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromXPixelLabel,fromXPixelField).build(), 
-                                             HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromYPixelLabel,fromYPixelField).build());
-
-		final StackPane fromContainer = new StackPane();
-		
-		this.grid.add(fromContainer, 2, rowIndex);
-		rowIndex++;
-		
-		/* To */
-		CheckBox toCB = new CheckBox();
-		toCB.selectedProperty().bindBidirectional(isTo);
-		ChoiceBox<LinearDirection> toChoice = new ChoiceBox<LinearDirection>();
-		toChoice.disableProperty().bind(toCB.selectedProperty().not());
-		toChoice.setItems(LinearDirection.getList());
-		toChoice.getSelectionModel().select(LinearDirection.BOTTOM);
-		toDirection.bind(toChoice.getSelectionModel().selectedItemProperty());
-		
-		// To Percent Container fields
-		Label toXPercentLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
-		SliderTextField toXPercentField = new SliderTextField(-120, 120, 0, "%");
-		toXPercentField.sliderDisableProperty().bind(toCB.selectedProperty().not());
-		toXPercent.bindBidirectional(toXPercentField.valueProperty());
-		
-		Label toYPercentLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
-		SliderTextField toYPercentField = new SliderTextField(-120, 120, 0, "%");
-		toYPercentField.sliderDisableProperty().bind(toCB.selectedProperty().not());
-		toYPercent.bindBidirectional(toYPercentField.valueProperty());
-		
-		final VBox toPercentLayout = new VBox();
-		toPercentLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toXPercentLabel,toXPercentField).build(), 
-				                               HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toYPercentLabel,toYPercentField).build());
-		
-		// To Pixel Container fields
-		Label toXPixelLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
-		SliderTextField toXPixelField = new SliderTextField(-120, 120, 0, "px");
-		toXPixelField.sliderDisableProperty().bind(toCB.selectedProperty().not());
-		toXPixel.bindBidirectional(toXPixelField.valueProperty());
-		
-		Label toYPixelLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
-		SliderTextField toYPixelField = new SliderTextField(-120, 120, 0, "px");
-		toYPixelField.sliderDisableProperty().bind(toCB.selectedProperty().not());
-		toYPixel.bindBidirectional(toYPixelField.valueProperty());
-		
-		final VBox toPixelLayout = new VBox();
-		toPixelLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toXPixelLabel,toXPixelField).build(), 
-                                             HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toYPixelLabel,toYPixelField).build());
-
-				
-		final StackPane toContainer = new StackPane();
-		
-		this.grid.add(toCB, 0, rowIndex);
-		this.grid.add(new Label("To : "), 1, rowIndex);
-		this.grid.add(toContainer, 2, rowIndex);
-		rowIndex++;
-		
-		grp.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-			public void changed(ObservableValue<? extends Toggle> arg0,	Toggle arg1, Toggle arg2) {
-				RadioButton btn = (RadioButton)arg2;
-				fromContainer.getChildren().clear();
-				toContainer.getChildren().clear();
-				if(btn.getId().equals("per")){
-					isFromPixel.set(false);
-					fromContainer.getChildren().add(fromPercentLayout);
-					toContainer.getChildren().add(toPercentLayout);
+		// Selecting the percent by default.
+		grp.selectToggle(grp.getToggles().get(0));
+		isFrom.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean selected) {
+				if(selected){
+					RadioButton btn = (RadioButton)grp.getSelectedToggle();
+					loadContainerByRadio(btn);
+					toCB.setDisable(true);
+					toCB.setSelected(true);
 				}else{
-					isFromPixel.set(true);
-					fromContainer.getChildren().add(fromPixelLayout);
-					toContainer.getChildren().add(toPixelLayout);
+					toContainer.getChildren().clear();
+					toContainer.getChildren().add(toChoice);
+					toCB.setDisable(false);
 				}
 			}
 		});
-		grp.selectToggle(percentBtn);
+		isFrom.set(true);
+		isFrom.set(false);
 		
 		/* Repeat Or Reflect*/
 		CheckBox repeatCB = new CheckBox();
@@ -225,20 +146,162 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		
 		checkForDeleteBtn();
 		
-		this.grid.getColumnConstraints().addAll(ColumnConstraintsBuilder.create().minWidth(20).build(),
-				                                ColumnConstraintsBuilder.create().minWidth(110).build()  );
+		this.grid.getColumnConstraints().addAll(ColumnConstraintsBuilder.create().halignment(HPos.LEFT).minWidth(20).build(),
+				                                ColumnConstraintsBuilder.create().halignment(HPos.LEFT).minWidth(110).build());
+		this.grid.getRowConstraints().addAll(RowConstraintsBuilder.create().valignment(VPos.TOP).build(),
+											 RowConstraintsBuilder.create().valignment(VPos.TOP).build(),
+											 RowConstraintsBuilder.create().valignment(VPos.TOP).build());
+                  
 	}
 
+	private void configureFrom(){
+		/* From */
+		CheckBox fromCB = new CheckBox();
+		fromCB.selectedProperty().bindBidirectional(isFrom);
+		
+		this.grp = new ToggleGroup();
+		RadioButton percentBtn = RadioButtonBuilder.create().id("per").text("Percentage").toggleGroup(this.grp).build();
+		RadioButton pixelBtn = RadioButtonBuilder.create().id("pix").text("Pixel").toggleGroup(this.grp).build();
+		percentBtn.disableProperty().bind(fromCB.selectedProperty().not());
+		pixelBtn.disableProperty().bind(fromCB.selectedProperty().not());
+		grp.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			public void changed(ObservableValue<? extends Toggle> arg0,	Toggle arg1, Toggle arg2) {
+				RadioButton btn = (RadioButton)arg2;
+				loadContainerByRadio(btn);
+			}
+		});
+		
+		this.grid.add(fromCB, 0, rowIndex);
+		this.grid.add(new Label("From : "), 1, rowIndex);
+		this.grid.add(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).spacing(10).children(percentBtn,pixelBtn).build(), 2, rowIndex);
+		rowIndex++;
+		
+		// From Percent Container fields
+		Label fromXPercentLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
+		SliderTextField fromXPercentField = new SliderTextField(-120, 120, 0, "%");
+		fromXPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromXPercent.bindBidirectional(fromXPercentField.valueProperty());
+		
+		Label fromYPercentLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
+		SliderTextField fromYPercentField = new SliderTextField(-120, 120, 0, "%");
+		fromYPercentField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromYPercent.bindBidirectional(fromYPercentField.valueProperty());
+		
+		fromPercentLayout = new VBox();
+		fromPercentLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromXPercentLabel,fromXPercentField).build(), 
+				                               HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromYPercentLabel,fromYPercentField).build());
+		
+		// From Pixel Container fields
+		Label fromXPixelLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
+		SliderTextField fromXPixelField = new SliderTextField(-120, 120, 0, "px");
+		fromXPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromXPixel.bindBidirectional(fromXPixelField.valueProperty());
+		
+		Label fromYPixelLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
+		SliderTextField fromYPixelField = new SliderTextField(-120, 120, 0, "px");
+		fromYPixelField.sliderDisableProperty().bind(fromCB.selectedProperty().not());
+		fromYPixel.bindBidirectional(fromYPixelField.valueProperty());
+		
+		fromPixelLayout = new VBox();
+		fromPixelLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromXPixelLabel,fromXPixelField).build(), 
+                                             HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(fromYPixelLabel,fromYPixelField).build());
+
+		fromContainer = new StackPane();
+		
+		this.grid.add(fromContainer, 2, rowIndex);
+		rowIndex++;
+	}
+	
+	private void configureTo(){
+		/* To */
+		toCB = new CheckBox();
+		toCB.selectedProperty().bindBidirectional(isTo);
+		toChoice = new ChoiceBox<LinearDirection>();
+		toChoice.disableProperty().bind(toCB.selectedProperty().not());
+		toChoice.setItems(LinearDirection.getList());
+		toChoice.getSelectionModel().select(LinearDirection.BOTTOM);
+		toDirection.bind(toChoice.getSelectionModel().selectedItemProperty());
+		
+		// To Percent Container fields
+		Label toXPercentLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
+		SliderTextField toXPercentField = new SliderTextField(-120, 120, 50, "%");
+		toXPercentField.sliderDisableProperty().bind(isFrom.not());
+		toXPercent.bindBidirectional(toXPercentField.valueProperty());
+		
+		Label toYPercentLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
+		SliderTextField toYPercentField = new SliderTextField(-120, 120, 50, "%");
+		toYPercentField.sliderDisableProperty().bind(isFrom.not());
+		toYPercent.bindBidirectional(toYPercentField.valueProperty());
+		
+		toPercentLayout = new VBox();
+		toPercentLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toXPercentLabel,toXPercentField).build(), 
+				                               HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toYPercentLabel,toYPercentField).build());
+		
+		// To Pixel Container fields
+		Label toXPixelLabel = LabelBuilder.create().text("X : ").minWidth(20).build();
+		SliderTextField toXPixelField = new SliderTextField(0, 300, 50, "px");
+		toXPixelField.sliderDisableProperty().bind(isFrom.not());
+		toXPixel.bindBidirectional(toXPixelField.valueProperty());
+		
+		Label toYPixelLabel = LabelBuilder.create().text("Y : ").minWidth(20).build();
+		SliderTextField toYPixelField = new SliderTextField(0, 300, 50, "px");
+		toYPixelField.sliderDisableProperty().bind(isFrom.not());
+		toYPixel.bindBidirectional(toYPixelField.valueProperty());
+		
+		toPixelLayout = new VBox();
+		toPixelLayout.getChildren().addAll(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toXPixelLabel,toXPixelField).build(), 
+                                             HBoxBuilder.create().alignment(Pos.CENTER_LEFT).children(toYPixelLabel,toYPixelField).build());
+
+				
+		toContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
+		
+		this.grid.add(toCB, 0, rowIndex);
+		this.grid.add(new Label("To : "), 1, rowIndex);
+		this.grid.add(toContainer, 2, rowIndex);
+		rowIndex++;
+		
+	}
+	
+	private void loadContainerByRadio(RadioButton btn){
+		fromContainer.getChildren().clear();
+		toContainer.getChildren().clear();
+		if(btn.getId().equals("per")){
+			isFromPixel.set(false);
+			fromContainer.getChildren().add(fromPercentLayout);
+			toContainer.getChildren().add(toPercentLayout);
+		}else{
+			isFromPixel.set(true);
+			fromContainer.getChildren().add(fromPixelLayout);
+			toContainer.getChildren().add(toPixelLayout);
+		}
+	}
+	
 	public void buildGradient() {
 		StringBuilder sytx = new StringBuilder(bgLinear);
 		
 		// From
 		if(isFrom.get()){
-			
+			if(isFromPixel.get()){
+				sytx.append(from);
+				sytx.append(fromXPixel.get()).append(fromPixelUnit);
+				sytx.append(fromYPixel.get()).append(fromPixelUnit);
+				sytx.append(to);
+				sytx.append(toXPixel.get()).append(toPixelUnit);
+				sytx.append(toYPixel.get()).append(toPixelUnit);
+				sytx.append(separator);
+				
+			}else{
+				sytx.append(from);	
+				sytx.append(fromXPercent.get()).append(fromPercentUnit);
+				sytx.append(fromYPercent.get()).append(fromPercentUnit);
+				sytx.append(to);
+				sytx.append(toXPercent.get()).append(toPercentUnit);
+				sytx.append(toYPercent.get()).append(toPercentUnit);
+				sytx.append(separator);
+			}
 		}
-		
 		// To
-		if(isTo.get() && toDirection.getValue()!=null){
+		else if(isTo.get() && toDirection.getValue()!=null){
 			sytx.append(to);
 			sytx.append(toDirection.getValue().toString());
 			sytx.append(separator);
@@ -255,8 +318,12 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		for (int i=0 ; i<colorStops.size(); i++) {
 			dto =colorStops.get(i);
 			if(dto.getColorCode()!=null && !dto.getColorCode().equals("")){
-				sytx.append(dto.getColorCode());
-				
+				if(dto.getColorCode().indexOf("#") == 0){
+					sytx.append(dto.getColorCode());
+				}else{
+					sytx.append("#"+dto.getColorCode());
+				}
+						
 				if(dto.getPercent()>0){
 					sytx.append(spacer).append(dto.getPercent()).append(colorStopUnit);
 				}

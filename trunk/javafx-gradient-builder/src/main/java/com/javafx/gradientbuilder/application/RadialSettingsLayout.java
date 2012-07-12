@@ -186,7 +186,11 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		for (int i=0 ; i<colorStops.size(); i++) {
 			dto =colorStops.get(i);
 			if(dto.getColorCode()!=null && !dto.getColorCode().equals("")){
-				sytx.append(dto.getColorCode());
+				if(dto.getColorCode().indexOf("#") == 0){
+					sytx.append(dto.getColorCode());
+				}else{
+					sytx.append("#"+dto.getColorCode());
+				}
 				
 				if(dto.getPercent()>0){
 					sytx.append(spacer).append(dto.getPercent()).append(colorStopUnit);
