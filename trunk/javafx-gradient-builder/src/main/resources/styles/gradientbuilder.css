@@ -143,3 +143,6 @@
 	-fx-font-weight:bold;
 	-fx-text-fill:#b22222;
 }
+.builder-scroll-pane{
+-fx-background-color: linear-gradient(to bottom, #f0f8ff, #ffe4b5);
+}
