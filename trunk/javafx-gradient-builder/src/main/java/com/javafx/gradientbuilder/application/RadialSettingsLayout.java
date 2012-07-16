@@ -2,16 +2,24 @@ package com.javafx.gradientbuilder.application;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.LabelBuilder;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.RadioButtonBuilder;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextAreaBuilder;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraintsBuilder;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBoxBuilder;
 
@@ -24,7 +32,9 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 	protected SimpleBooleanProperty isCenter = new SimpleBooleanProperty(true);
 	protected SimpleIntegerProperty centerX = new SimpleIntegerProperty();
 	protected SimpleIntegerProperty centerY = new SimpleIntegerProperty();
-	protected SimpleIntegerProperty radius = new SimpleIntegerProperty();
+	protected SimpleBooleanProperty isRadiusPixel = new SimpleBooleanProperty();
+	protected SimpleIntegerProperty radiusPixel = new SimpleIntegerProperty();
+	protected SimpleIntegerProperty radiusPercent = new SimpleIntegerProperty();
 	
 	public RadialSettingsLayout(GradientBuilderApp app){
 		super();
@@ -42,7 +52,9 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		focusDistance.addListener(changeListener);
 		centerX.addListener(changeListener);
 		centerY.addListener(changeListener);
-		radius.addListener(changeListener);
+		isRadiusPixel.addListener(changeListener);
+		radiusPixel.addListener(changeListener);
+		radiusPercent.addListener(changeListener);
 		repeatReflect.addListener(changeListener);
 		
 		isFocusAngle.addListener(changeListener);
@@ -112,11 +124,39 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		rowIndex++;
 		
 		/* Radius */
-		SliderTextField radiusField = new SliderTextField(0, 120, 50, "%");
-		radius.bindBidirectional(radiusField.valueProperty());
+		final SliderTextField radiusPercentField = new SliderTextField(0, 120, 50, "%");
+		radiusPercent.bindBidirectional(radiusPercentField.valueProperty());
+		
+		final SliderTextField radiusPixelField = new SliderTextField(0, 300, 100, "px");
+		radiusPixel.bindBidirectional(radiusPixelField.valueProperty());
+		
+		final StackPane radiusContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
+		
+		ToggleGroup grp = new ToggleGroup();
+		RadioButton percentBtn = RadioButtonBuilder.create().id("per").text("Percentage").toggleGroup(grp).build();
+		RadioButton pixelBtn = RadioButtonBuilder.create().id("pix").text("Pixel").toggleGroup(grp).build();
+		radiusPercentField.disableProperty().bind(pixelBtn.selectedProperty());
+		radiusPixelField.disableProperty().bind(percentBtn.selectedProperty());
+		grp.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			public void changed(ObservableValue<? extends Toggle> arg0,	Toggle arg1, Toggle arg2) {
+				RadioButton btn = (RadioButton)arg2;
+				radiusContainer.getChildren().clear();
+				if(btn.getId().equals("per")){
+					isRadiusPixel.set(false);
+					radiusContainer.getChildren().add(radiusPercentField);
+				}else{
+					isRadiusPixel.set(true);
+					radiusContainer.getChildren().add(radiusPixelField);
+				}
+			}
+		});
+		grp.selectToggle(percentBtn);
 		
 		this.grid.add(new Label("Radius : "), 1, rowIndex);
-		this.grid.add(radiusField, 2, rowIndex, 2, 1);
+		this.grid.add(HBoxBuilder.create().alignment(Pos.CENTER_LEFT).spacing(10).children(percentBtn,pixelBtn).build(), 2, rowIndex, 2, 1);
+		rowIndex++;
+		
+		this.grid.add(radiusContainer, 2, rowIndex, 2, 1);
 		rowIndex++;
 		
 		/* Repeat Or Reflect*/
@@ -174,8 +214,13 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		}
 		
 		// Radius
-		sytx.append(radiusStart).append(radius.get()).append(radiusPercentUnit);
-		sytx.append(separator);
+		if(isRadiusPixel.get()){
+			sytx.append(radiusStart).append(radiusPixel.get()).append(radiusPixelUnit);
+			sytx.append(separator);
+		}else{
+			sytx.append(radiusStart).append(radiusPercent.get()).append(radiusPercentUnit);
+			sytx.append(separator);
+		}
 		
 		// Repeat or Reflect
 		if(isRepeat.get() && repeatReflect.getValue()!=null && !repeatReflect.getValue().equals(RepeatOrReflect.NONE)){
