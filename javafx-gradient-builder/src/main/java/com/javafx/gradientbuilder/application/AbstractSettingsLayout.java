@@ -56,6 +56,12 @@ public abstract class AbstractSettingsLayout extends StackPane{
 
 	protected abstract void buildGradient();
 	
+	protected HBox getColorStopTemplate(int startValue, int endValue, int pos, int finalPos, String color){
+		HBox hb = getColorStopTemplate(startValue, endValue, pos, finalPos);
+		((ColorPicker)hb.getChildren().get(0)).setColorCode(color);
+		return hb;
+	}
+	
 	protected HBox getColorStopTemplate(int startValue, int endValue, int pos, int finalPos){
 		ColorStopDTO dto = new ColorStopDTO();
 		dto.colorCodeProperty().addListener(changeListener);

@@ -137,8 +137,8 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		
 		/* Color Stops */
 		colorStopsVB = VBoxBuilder.create().spacing(15).build();
-		colorStopsVB.getChildren().addAll(getColorStopTemplate(0, 100, 0, -1),
-										  getColorStopTemplate(0, 100, 0, -1));
+		colorStopsVB.getChildren().addAll(getColorStopTemplate(0, 100, 0, -1, "#ffb6c1"),
+										  getColorStopTemplate(0, 100, 0, -1, "#ffa500"));
 		
 		this.grid.add(StackPaneBuilder.create().alignment(Pos.TOP_LEFT).padding(new Insets(5,0,0,0)).children(new Label("Color Stops : ")).build(), 1, rowIndex);
 		this.grid.add(colorStopsVB, 2, rowIndex);

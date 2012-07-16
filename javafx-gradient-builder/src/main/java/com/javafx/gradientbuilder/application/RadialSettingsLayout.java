@@ -31,6 +31,8 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		this.app = app;
 		this.grid = new GridPane();
 		this.grid.setVgap(10);
+		setMinWidth(600);
+		setPrefWidth(600);
 		addListeners();
 		configure();
 	}
@@ -133,8 +135,8 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		
 		/* Color Stops */
 		colorStopsVB = VBoxBuilder.create().spacing(15).build();
-		colorStopsVB.getChildren().addAll(getColorStopTemplate(0, 100, 0, -1),
-										  getColorStopTemplate(0, 100, 0, -1));
+		colorStopsVB.getChildren().addAll(getColorStopTemplate(0, 100, 0, -1, "#ffe4c4"),
+										  getColorStopTemplate(0, 100, 0, -1, "#d2691e"));
 		
 		this.grid.add(StackPaneBuilder.create().alignment(Pos.TOP_LEFT).padding(new Insets(5,0,0,0)).children(new Label("Color Stops : ")).build(), 1, rowIndex);
 		this.grid.add(colorStopsVB, 2, rowIndex, 2, 1);
