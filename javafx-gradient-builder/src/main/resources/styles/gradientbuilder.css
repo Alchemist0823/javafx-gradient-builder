@@ -102,9 +102,9 @@
 }
 
 .radio-selected-c3{
-	-fx-fill: linear-gradient(to bottom, #57AE43, #91ED77);
+	-fx-fill: radial-gradient(focus-angle 242deg , focus-distance 39% , center 50% 50% , radius 61% , reflect, #f0f8ff, #79d362, #5AA84b);
 	-fx-stroke-width:1px;
-	-fx-stroke:#4C4C66;
+	-fx-stroke:#7a7b8f;
 }
 
 .radio-unselected-c1{
@@ -116,7 +116,9 @@
 }
 
 .radio-unselected-c3{
-	-fx-fill: linear-gradient(to bottom, #4C4C66, #626288);
+	-fx-fill: #c1c1c1;
+	-fx-stroke-width:1px;
+	-fx-stroke:#7a7b8f;
 }
 
 .colorInfo-box{
