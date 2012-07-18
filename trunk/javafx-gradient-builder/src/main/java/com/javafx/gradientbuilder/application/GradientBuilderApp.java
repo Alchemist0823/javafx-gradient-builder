@@ -3,12 +3,9 @@ package com.javafx.gradientbuilder.application;
 
 import javafx.application.Application;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -22,17 +19,11 @@ import javafx.scene.control.ScrollPaneBuilder;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.ToolBarBuilder;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.GridPaneBuilder;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -46,12 +37,9 @@ public class GradientBuilderApp extends Application {
 	StackPane circle;
 	
 	enum GradientType { LINEAR, RADIAL };
-	
 	LinearSettingsLayout linearSettingLayout;
 	RadialSettingsLayout radialSettingLayout;
 	StackPane settingsContainer;
-	
-		// Properties
 	private SimpleObjectProperty<GradientType> gradientType = new SimpleObjectProperty<GradientType>();
 	
 	
@@ -64,12 +52,8 @@ public class GradientBuilderApp extends Application {
 		this.stage = stage;
 		configureScene();
 		configureStage();
-		
 		configureCenter();
 		configureToolBar();
-		
-		//ScenicView.show(scene);
-		
 	}
 
 	private void configureToolBar() {
@@ -196,13 +180,11 @@ public class GradientBuilderApp extends Application {
 	}
 	
 	private StackPane configureBottomPane(){
-		
 		circle = StackPaneBuilder.create().alignment(Pos.CENTER)
 										  .styleClass("circle-shape")
 										  .style("-fx-background-color:yellow;")
 										  .build();
 
-		
 		HBox hb = HBoxBuilder.create()
 							 .alignment(Pos.CENTER_RIGHT)
 							 .prefHeight(20).build();
@@ -275,10 +257,13 @@ public class GradientBuilderApp extends Application {
 		return scroll;
 	}
 
+	/**
+	 * Method to apply the styles to the shapes.
+	 * @param bg - CSS gradient string.
+	 */
 	public void applyStyles(String bg){
 		rectangle.setStyle("-fx-background-color:"+bg);
 		circle.setStyle("-fx-background-color:"+bg);
-		
 	}
 }
 
