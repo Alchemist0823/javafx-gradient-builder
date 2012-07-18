@@ -53,7 +53,6 @@ public class ColorPicker extends HBox{
 		textField.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> arg0,	String arg1, String newTxt) {
-				System.out.println(newTxt);
 				// If the new text length is exceeded.
 				if((newTxt.indexOf("#") == 0) && (newTxt.length()==7) ){
 					colorCode.set(newTxt);
