@@ -26,7 +26,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
-
+/**
+ * Color Picker component to selected the color in the text field.
+ * Reference: https://forums.oracle.com/forums/thread.jspa?threadID=2316310
+ */
 public class ColorPicker extends HBox{
 	private SimpleStringProperty colorCode = new SimpleStringProperty();
 	private ColorChooser colorChooser;

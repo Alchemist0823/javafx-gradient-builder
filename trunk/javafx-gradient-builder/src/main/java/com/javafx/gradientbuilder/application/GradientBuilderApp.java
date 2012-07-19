@@ -1,6 +1,5 @@
 package com.javafx.gradientbuilder.application;
 
-
 import javafx.application.Application;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,19 +28,21 @@ import javafx.stage.Stage;
 
 public class GradientBuilderApp extends Application {
 
-	Stage stage;
-	Scene scene;
-	BorderPane root;
+	// Root Node of the application.
+	private BorderPane root;
 	
-	StackPane rectangle;
-	StackPane circle;
+	// Shapes(Panes) to which the gradient is applied.
+	private StackPane rectangle;
+	private StackPane circle;
 	
-	enum GradientType { LINEAR, RADIAL };
-	LinearSettingsLayout linearSettingLayout;
-	RadialSettingsLayout radialSettingLayout;
-	StackPane settingsContainer;
+	// Instance Variables
+	private enum GradientType { LINEAR, RADIAL };
+	private LinearSettingsLayout linearSettingLayout;
+	private RadialSettingsLayout radialSettingLayout;
+	private StackPane settingsContainer;
+	
+	// Observable Property to determine the type of the current selected gradient.
 	private SimpleObjectProperty<GradientType> gradientType = new SimpleObjectProperty<GradientType>();
-	
 	
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -49,32 +50,88 @@ public class GradientBuilderApp extends Application {
 	
 	@Override
 	public void start(Stage stage) throws Exception {
-		this.stage = stage;
-		configureScene();
-		configureStage();
+		configureSceneAndStage(stage);
 		configureCenter();
 		configureToolBar();
 	}
 
+	/**
+	 * Configures the Scene and Stage for the application.
+	 */
+	private void configureSceneAndStage(Stage stage){
+		// Initializing the root node
+		root = new BorderPane();
+		root.autosize();
+		Scene scene = new Scene(root, Color.WHITE);
+		scene.getStylesheets().add("styles/gradientbuilder.css");
+		
+		// Default settings for the stage.
+		stage.setTitle("Gradient Builder");
+		stage.setWidth(1200);
+	    stage.setHeight(650);
+	    stage.setScene(scene);
+	    stage.show();
+	}
+
+	/**
+	 * Configures the center part(body) of the application.
+	 */
+	private void configureCenter() {
+		// Getting the left side top pane. (Rectangle's view)
+		StackPane rectanglePane = configureRectanglePane();
+		
+		// Getting the left side bottom pane. (Circle's view)
+		StackPane circlePane = configureCirclePane();
+		
+		// Getting the right side settings pane.
+		ScrollPane rightPane = configureGradientSettings();
+		
+		SplitPane leftPane = new SplitPane();
+		leftPane.setOrientation(Orientation.VERTICAL);
+		leftPane.getItems().addAll(rectanglePane, circlePane);
+		
+		SplitPane mainPane = new SplitPane();
+		mainPane.getItems().addAll(leftPane,rightPane);
+		
+		// Setting the entire layout as the center to the root(BorderPane) node.
+		root.setCenter(mainPane);
+	}
+	
+	/**
+	 * Configures the tool bar of the application.
+	 */
 	private void configureToolBar() {
-		ToolBar tb = ToolBarBuilder.create().prefHeight(35).build();
-		
+		// Getting the "Custom" radio buttons for the Gradient types.
 		final CustomRadioButton linearButton = new CustomRadioButton("Linear");
-		linearButton.setSelected(true);
-		
+		linearButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				gradientType.set(GradientType.LINEAR);
+			}
+		});
 		final CustomRadioButton radialButton = new CustomRadioButton("Radial");
+		radialButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				gradientType.set(GradientType.RADIAL);
+			}
+		});
 		
+		// When the gradient type is changed, Listener to switch the layouts and apply the styles to the shapes.
 		gradientType.addListener(new ChangeListener<GradientType>() {
 			@Override
 			public void changed(ObservableValue<? extends GradientType> arg0,	GradientType arg1, GradientType type) {
+				settingsContainer.getChildren().clear();
 				switch(type){
 				case LINEAR:
-					settingsContainer.getChildren().clear();
+					linearButton.setSelected(true);
+					radialButton.setSelected(false);
 					settingsContainer.getChildren().add(linearSettingLayout);
 					linearSettingLayout.buildGradient();
 					break;
 				case RADIAL:
-					settingsContainer.getChildren().clear();
+					linearButton.setSelected(false);
+					radialButton.setSelected(true);
 					settingsContainer.getChildren().add(radialSettingLayout);
 					radialSettingLayout.buildGradient();
 					break;
@@ -82,68 +139,26 @@ public class GradientBuilderApp extends Application {
 			}
 		});
 		
-		EventHandler<ActionEvent> btnAction = new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				if(linearButton.getSelected()){
-					linearButton.setSelected(false);
-					radialButton.setSelected(true);
-					gradientType.set(GradientType.RADIAL);
-				}else{
-					linearButton.setSelected(true);
-					radialButton.setSelected(false);
-					gradientType.set(GradientType.LINEAR);
-				}
-			}
-		};
-		linearButton.setOnAction(btnAction);
-		radialButton.setOnAction(btnAction);
+		// Initializing the application tool bar and setting the radio buttons.
+		ToolBar toolBar = ToolBarBuilder.create().prefHeight(35).build();
+		toolBar.getItems().addAll(linearButton, radialButton);
 		
-		tb.getItems().addAll(linearButton, radialButton);
-		root.setTop(tb);
-		radialButton.fire();
+		// Setting the ToolBar as the top to the root(BorderPane) node.
+		root.setTop(toolBar);
+		
+		// By default selecting the "Linear" gradient.
+		gradientType.set(GradientType.LINEAR);
 	}
 
-	private void configureStage(){
-		stage.setTitle("Gradient Builder");
-		stage.setWidth(1200);
-	    stage.setHeight(650);
-	    stage.setScene(this.scene);
-	    stage.show();
-	}
-	
-	private void configureScene(){
-		root = new BorderPane();
-		root.autosize();
-		this.scene = new Scene(root, Color.WHITE);
-		this.scene.getStylesheets().add("styles/gradientbuilder.css");
-	}
+	/**
+	 * Configures the layout for the "Rectangle" shape.
+	 * @return StackPane
+	 */
+	private StackPane configureRectanglePane(){
+		// Initializing the "Rectangle".
+		rectangle = new StackPane();
 
-	private void configureCenter() {
-		StackPane topPane = configureTopPane();
-		StackPane bottomPane = configureBottomPane();
-		ScrollPane rightPane = configureGradientSettings();
-		
-		SplitPane leftPane = new SplitPane();
-		leftPane.setOrientation(Orientation.VERTICAL);
-		leftPane.getItems().addAll(topPane,bottomPane);
-		
-		SplitPane mainPane = new SplitPane();
-		mainPane.getItems().addAll(leftPane,rightPane);
-		
-		root.setCenter(mainPane);
-	}
-	
-	private StackPane configureTopPane(){
-		
-		rectangle = StackPaneBuilder.create().alignment(Pos.CENTER)
-										.style("-fx-background-color:yellow;")
-										.build();
-
-		HBox hb = HBoxBuilder.create()
-							 .alignment(Pos.CENTER_RIGHT)
-							 .prefHeight(20).build();
-		
+		// Creating the width label and binding its value with the rectangle's "widthProperty".
 		Label widthLbl = getValueLabel();
 		widthLbl.textProperty().bind(new StringBinding() {
 			{
@@ -155,6 +170,7 @@ public class GradientBuilderApp extends Application {
 			}
 		});
 		
+		// Creating the height label and binding its value with the rectangle's "heightProperty".
 		Label heightLbl = getValueLabel();
 		heightLbl.textProperty().bind(new StringBinding() {
 			{
@@ -166,29 +182,36 @@ public class GradientBuilderApp extends Application {
 			}
 		});
 		
+		// Creating a HBox layout to place the Rectangle's width and height information.
+		HBox hb = HBoxBuilder.create()
+							 .alignment(Pos.CENTER_RIGHT)
+							 .prefHeight(20).build();
 		hb.getChildren().addAll(getBoldLabel("Width : "), widthLbl, getSpacer(), getBoldLabel("Height : "), heightLbl);
 		
+		// BorderPane to hold the Rectangle and Bounds information.
 		BorderPane bp = new BorderPane();
 		bp.setCenter(rectangle);
 		bp.setBottom(hb);
 		
-		StackPane topPane = StackPaneBuilder.create()
+		// StackPane to hold the BorderPane and to apply the padding to BorderPane.
+		StackPane rectanglePane = StackPaneBuilder.create()
 											.padding(new Insets(15,15,3,15))
 											.children(bp)
 											.build();
-		return topPane;
+		return rectanglePane;
 	}
 	
-	private StackPane configureBottomPane(){
+	/**
+	 * Configures the layout for the "Circle" shape.
+	 * @return StackPane
+	 */
+	private StackPane configureCirclePane(){
+		// Initializing the "Circle".
 		circle = StackPaneBuilder.create().alignment(Pos.CENTER)
 										  .styleClass("circle-shape")
-										  .style("-fx-background-color:yellow;")
 										  .build();
 
-		HBox hb = HBoxBuilder.create()
-							 .alignment(Pos.CENTER_RIGHT)
-							 .prefHeight(20).build();
-		
+		// Creating the x-radius label and binding its value with the circle's half "widthProperty".
 		Label radiusX = getValueLabel();
 		radiusX.textProperty().bind(new StringBinding() {
 			{
@@ -200,6 +223,7 @@ public class GradientBuilderApp extends Application {
 			}
 		});
 		
+		// Creating the y-radius label and binding its value with the circle's half "heightProperty".
 		Label radiusY = getValueLabel();
 		radiusY.textProperty().bind(new StringBinding() {
 			{
@@ -210,44 +234,41 @@ public class GradientBuilderApp extends Application {
 				return ((circle.getHeight()/2))+"px";
 			}
 		});
+		
+		// Creating a HBox layout to place the Circle's x-radius and y-radius information.
+		HBox hb = HBoxBuilder.create()
+							 .alignment(Pos.CENTER_RIGHT)
+							 .prefHeight(20).build();
 		hb.getChildren().addAll(getBoldLabel("X-Radius : "), radiusX, getSpacer(), getBoldLabel("Y-Radius : "),radiusY);
 		
+		// BorderPane to hold the Circle and Bounds information.
 		BorderPane bp = new BorderPane();
 		bp.setCenter(circle);
 		bp.setBottom(hb);
 		
-		StackPane bottomPane = StackPaneBuilder.create()
+		// StackPane to hold the BorderPane and to apply the padding to BorderPane.
+		StackPane circlePane = StackPaneBuilder.create()
 											.padding(new Insets(15,15,3,15))
 											.children(bp)
 											.build();
-		return bottomPane;
+		return circlePane;
 	}
-	
-	private StackPane getSpacer(){
-		return StackPaneBuilder.create().prefWidth(20).build();
-	}
-	
-	private Label getBoldLabel(String str){
-		return LabelBuilder.create()
-						   .text(str)
-						   .style("-fx-font-weight:bold;").build();
-	}
-	
-	private Label getValueLabel(){
-		return LabelBuilder.create()
-						   .style("-fx-font-family:verdana;").build();
-	}
-	
 	
 	/**
 	 * Configures the Gradient setting pane.
 	 * @return ScrollPane
 	 */
 	private ScrollPane configureGradientSettings(){
+		// Initializing the RadialSettingsLayout.
 		radialSettingLayout = new RadialSettingsLayout(this);
+		
+		// Initializing the LinearSettingsLayout.
 		linearSettingLayout = new LinearSettingsLayout(this);
 		
+		// Initializing the container to hold RadialSettingsLayout or LinearSettingsLayout.
 		settingsContainer = StackPaneBuilder.create().alignment(Pos.TOP_LEFT).build();
+		
+		// Wrapping the container with the ScrollPane.
 		ScrollPane scroll = ScrollPaneBuilder.create()
 				                             .styleClass("builder-scroll-pane")
 				                             .fitToHeight(true)
@@ -257,6 +278,33 @@ public class GradientBuilderApp extends Application {
 		return scroll;
 	}
 
+	/**
+	 * Utility method to return a StackPane with some width to act like a spacer.
+	 * @return StackPane
+	 */
+	private StackPane getSpacer(){
+		return StackPaneBuilder.create().prefWidth(20).build();
+	}
+	
+	/**
+	 * Utility method to return a Label with bold font style.
+	 * @return Label
+	 */
+	private Label getBoldLabel(String str){
+		return LabelBuilder.create()
+						   .text(str)
+						   .style("-fx-font-weight:bold;").build();
+	}
+	
+	/**
+	 * Utility method to return a Label with normal font style.
+	 * @return Label
+	 */
+	private Label getValueLabel(){
+		return LabelBuilder.create()
+						   .style("-fx-font-family:verdana;").build();
+	}
+	
 	/**
 	 * Method to apply the styles to the shapes.
 	 * @param bg - CSS gradient string.

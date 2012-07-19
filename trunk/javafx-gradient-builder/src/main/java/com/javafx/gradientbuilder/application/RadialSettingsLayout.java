@@ -23,8 +23,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBoxBuilder;
 
+/**
+ * Radial Settings layout class to configure the layout.
+ * @author Sai.Dandem
+ *
+ */
 public class RadialSettingsLayout extends AbstractSettingsLayout implements SyntaxConstants{
 
+	// Variables to which the values are binded to. And are used to build the gradient.
 	protected SimpleBooleanProperty isFocusAngle = new SimpleBooleanProperty(true);
 	protected SimpleIntegerProperty focusAngle = new SimpleIntegerProperty();
 	protected SimpleBooleanProperty isFocusDistance = new SimpleBooleanProperty(true);
@@ -36,6 +42,10 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 	protected SimpleIntegerProperty radiusPixel = new SimpleIntegerProperty();
 	protected SimpleIntegerProperty radiusPercent = new SimpleIntegerProperty();
 	
+	/**
+	 * Constructor to configure the layout.
+	 * @param app - GradientBuilderApp
+	 */
 	public RadialSettingsLayout(GradientBuilderApp app){
 		super();
 		this.app = app;
@@ -43,10 +53,18 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		this.grid.setVgap(10);
 		setMinWidth(600);
 		setPrefWidth(600);
+		
+		// Calling the method to add the listener to all the observable properties.
 		addListeners();
+		
+		// Calling the method to configure the layout.
 		configure();
 	}
 
+	/**
+	 * Method to configure the common listener to all the observable properties.
+	 * Any change in one value will fire the listener and builds the gradient and apply the styles to the shapes.
+	 */
 	private void addListeners() {
 		focusAngle.addListener(changeListener);
 		focusDistance.addListener(changeListener);
@@ -63,6 +81,9 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 		isRepeat.addListener(changeListener);
 	}
 
+	/**
+	 * Configures the settings layout.
+	 */
 	private void configure() {
 		
 		/* Output Heading*/
@@ -191,6 +212,10 @@ public class RadialSettingsLayout extends AbstractSettingsLayout implements Synt
 	}
 	
 	
+	/**
+	 * Method to build the final gradient string from the observable properties.,
+	 * and apply it on the shapes.
+	 */
 	public void buildGradient() {
 		StringBuilder sytx = new StringBuilder(bgRadial);
 		

@@ -10,6 +10,11 @@ import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CircleBuilder;
 
+/**
+ * Custom button, to resemble like a radio button.
+ * @author Sai.Dandem
+ *
+ */
 public class CustomRadioButton extends Button{
 
 	private SimpleBooleanProperty selected = new SimpleBooleanProperty();

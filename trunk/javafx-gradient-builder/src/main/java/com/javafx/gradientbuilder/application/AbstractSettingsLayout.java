@@ -22,9 +22,13 @@ import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBox;
-
 import com.javafx.gradientbuilder.application.SyntaxConstants.RepeatOrReflect;
 
+/**
+ * Abstract class which contains the common fields for both "Linear Settings layout" and "Radial Settings Layout".
+ * @author Sai.Dandem
+ *
+ */
 public abstract class AbstractSettingsLayout extends StackPane{
 	
 	protected GradientBuilderApp app;
@@ -38,6 +42,7 @@ public abstract class AbstractSettingsLayout extends StackPane{
 	protected VBox colorStopsVB;
 	protected GridPane grid;
 	
+	// Listener to build the gradient on change of value.
 	protected ChangeListener<Object> changeListener = new ChangeListener<Object>() {
 		@Override
 		public void changed(ObservableValue<? extends Object> arg0,	Object arg1, Object arg2) {
@@ -45,6 +50,9 @@ public abstract class AbstractSettingsLayout extends StackPane{
 		}
 	};
 	
+	/**
+	 * Constructor to initialize the layout.
+	 */
 	public AbstractSettingsLayout() {
 		super();
 		setAlignment(Pos.TOP_LEFT);
@@ -56,12 +64,29 @@ public abstract class AbstractSettingsLayout extends StackPane{
 
 	protected abstract void buildGradient();
 	
+	/**
+	 * Returns the color stop row template.
+	 * @param startValue - Start value of the slider.
+	 * @param endValue - End value of the slider.
+	 * @param pos - Default value of the slider
+	 * @param finalPos - Position to which the color stop need to be added.
+	 * @param color - Color code to be set in the text field.
+	 * @return HBox
+	 */
 	protected HBox getColorStopTemplate(int startValue, int endValue, int pos, int finalPos, String color){
 		HBox hb = getColorStopTemplate(startValue, endValue, pos, finalPos);
 		((ColorPicker)hb.getChildren().get(0)).setColorCode(color);
 		return hb;
 	}
 	
+	/**
+	 * Returns the color stop row template.
+	 * @param startValue - Start value of the slider.
+	 * @param endValue - End value of the slider.
+	 * @param pos - Default value of the slider
+	 * @param finalPos - Position to which the color stop need to be added.
+	 * @return HBox
+	 */
 	protected HBox getColorStopTemplate(int startValue, int endValue, int pos, int finalPos){
 		ColorStopDTO dto = new ColorStopDTO();
 		dto.colorCodeProperty().addListener(changeListener);
@@ -108,11 +133,13 @@ public abstract class AbstractSettingsLayout extends StackPane{
 				deleteColorStop(hb);
 			}
 		});
-		
-		
 		return hb;
 	}
 	
+	/**
+	 * Method to add a new ColorStop row in the list and the layout. Called on click of "+" button.
+	 * @param current - Current color template row to determine the position.
+	 */
 	private void addNewColorStop(HBox current){
 		int finalPos = getColorStopPosition(current);
 		finalPos = (finalPos == colorStopsVB.getChildren().size()-1 || finalPos == -1) ? -1 : (finalPos+1);
@@ -121,10 +148,18 @@ public abstract class AbstractSettingsLayout extends StackPane{
 		}else{
 			colorStopsVB.getChildren().add(finalPos, getColorStopTemplate(0, 100, 0, finalPos));
 		}
+		
+		// After adding the row calling the method to build the gradient and apply the styles to the shapes.
 		buildGradient();
+		
+		// Calling the method to enable delete buttons based on the row count.
 		checkForDeleteBtn();
 	}
 	
+	/**
+	 * Method to remove the color stop row from the list and the layout. Called on click of "X" button.
+	 * @param current - Current color template row to determine the position.
+	 */
 	private void deleteColorStop(HBox current){
 		int finalPos = getColorStopPosition(current);
 		
@@ -133,11 +168,18 @@ public abstract class AbstractSettingsLayout extends StackPane{
 		colorStops.remove(finalPos);
 		
 		colorStopsVB.getChildren().remove(current);
+		// After adding the row calling the method to build the gradient and apply the styles to the shapes.
 		buildGradient();
+		
+		// Calling the method to enable delete buttons based on the row count.
 		checkForDeleteBtn();
 	}
 	
-	
+	/**
+	 * Utility method to get the color stop position from the list.
+	 * @param current - Current color template row to determine the position.
+	 * @return position.
+	 */
 	protected int getColorStopPosition(HBox current){
 		int finalPos = -1;
 		for (int i=0 ; i<colorStopsVB.getChildren().size(); i++) {
@@ -149,6 +191,9 @@ public abstract class AbstractSettingsLayout extends StackPane{
 		return finalPos;
 	}
 	
+	/**
+	 * Utility method to check for no of color-stops and enable/disable the delete buttons.
+	 */
 	protected void checkForDeleteBtn(){
 		boolean flag = (colorStopsVB.getChildren().size()>2) ? true : false;
 		for (Node node : colorStopsVB.getChildren()) {

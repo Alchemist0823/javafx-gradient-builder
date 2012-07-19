@@ -15,6 +15,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPaneBuilder;
 
+/**
+ * Customised component to bind the slider value to the text field.
+ * @author Sai.Dandem
+ *
+ */
 public class SliderTextField extends HBox{
 	private SimpleIntegerProperty value = new SimpleIntegerProperty();
 	
