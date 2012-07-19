@@ -3,6 +3,11 @@ package com.javafx.gradientbuilder.application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * String constants that are used to build the gradient syntax.
+ * @author Sai.Dandem
+ *
+ */
 public interface SyntaxConstants {
 	public String spacer=" ";
 	public String separator=", ";
@@ -71,6 +76,4 @@ public interface SyntaxConstants {
 			return this.value;
 		}
 	}
-	 
-	
 }

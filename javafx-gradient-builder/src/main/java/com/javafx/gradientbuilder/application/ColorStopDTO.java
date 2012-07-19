@@ -2,7 +2,11 @@ package com.javafx.gradientbuilder.application;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-
+/**
+ * DTO object to hold the Color Code and its percentage value.
+ * @author Sai.Dandem
+ *
+ */
 public class ColorStopDTO {
 	private SimpleStringProperty colorCode = new SimpleStringProperty();
 	private SimpleIntegerProperty percent = new SimpleIntegerProperty();

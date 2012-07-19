@@ -28,9 +28,14 @@ import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
 
-
+/**
+ * Linear Settings layout class to configure the layout.
+ * @author Sai.Dandem
+ *
+ */
 public class LinearSettingsLayout extends AbstractSettingsLayout implements SyntaxConstants{
 
+	// Variables to which the values are binded to. And are used to build the gradient.
 	protected SimpleBooleanProperty isFrom = new SimpleBooleanProperty();
 	protected SimpleBooleanProperty isFromPixel = new SimpleBooleanProperty();
 	protected SimpleIntegerProperty fromXPixel = new SimpleIntegerProperty();
@@ -45,6 +50,7 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 	protected SimpleIntegerProperty toYPercent = new SimpleIntegerProperty();
 	protected SimpleObjectProperty<LinearDirection> toDirection = new SimpleObjectProperty<LinearDirection>();
 	
+	// Instance variables used for building gradient.
 	int rowIndex =0;
 	ToggleGroup grp;
 	StackPane fromContainer;
@@ -56,15 +62,27 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 	ChoiceBox<LinearDirection> toChoice;
 	CheckBox toCB;
 	
+	/**
+	 * Constructor to configure the layout.
+	 * @param app - GradientBuilderApp
+	 */
 	public LinearSettingsLayout(GradientBuilderApp app){
 		super();
 		this.app = app;
 		this.grid = new GridPane();
 		this.grid.setVgap(10);
+		
+		// Calling the method to add the listener to all the observable properties.
 		addListeners();
+		
+		// Calling the method to configure the layout.
 		configure();
 	}
 	
+	/**
+	 * Method to configure the common listener to all the observable properties.
+	 * Any change in one value will fire the listener and builds the gradient and apply the styles to the shapes.
+	 */
 	private void addListeners() {
 		isFrom.addListener(changeListener);
 		isFromPixel.addListener(changeListener);
@@ -84,6 +102,9 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		repeatReflect.addListener(changeListener);
 	}
 
+	/**
+	 * Configures the settings layout.
+	 */
 	private void configure() {
 		/* Output Heading*/
 		Label outputHeading = LabelBuilder.create().text("Syntax Output :").styleClass("heading1").build();
@@ -154,6 +175,9 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
                   
 	}
 
+	/**
+	 * Configures the "from" parameter layout.
+	 */
 	private void configureFrom(){
 		/* From */
 		CheckBox fromCB = new CheckBox();
@@ -212,6 +236,9 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		rowIndex++;
 	}
 	
+	/**
+	 * Configures the "to" parameter layout.
+	 */
 	private void configureTo(){
 		/* To */
 		toCB = new CheckBox();
@@ -276,6 +303,10 @@ public class LinearSettingsLayout extends AbstractSettingsLayout implements Synt
 		}
 	}
 	
+	/**
+	 * Method to build the final gradient string from the observable properties.,
+	 * and apply it on the shapes.
+	 */
 	public void buildGradient() {
 		StringBuilder sytx = new StringBuilder(bgLinear);
 		
