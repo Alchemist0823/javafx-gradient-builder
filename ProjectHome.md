@@ -1,0 +1,1 @@
+An application which enables the user to have a visual appearance of gradient effect.
